@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BookOpen, Scroll, Feather, Sparkles } from 'lucide-react';
+import { BookOpen, Scroll, Feather, Sparkles, Search, User as UserIcon } from 'lucide-react';
 import { Category, Literature } from '../types';
 import { useLiteratureList } from '../hooks/useLiterature';
 import { useLanguageStore } from '../store/useLanguageStore';
@@ -18,6 +18,7 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({
   onAuthorClick,
 }) => {
   const [selectedCat, setSelectedCat] = useState<Category>('poem');
+  const [searchQuery, setSearchQuery] = useState('');
   const { uiLang } = useLanguageStore();
 
   const { data, isLoading } = useLiteratureList({ category: selectedCat });
@@ -49,18 +50,52 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({
     },
   ];
 
+  const filteredItems = (data?.items || []).filter((item) => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      item.title.toLowerCase().includes(q) ||
+      item.content.toLowerCase().includes(q) ||
+      item.author?.name?.toLowerCase().includes(q) ||
+      item.author?.username?.toLowerCase().includes(q)
+    );
+  });
+
   return (
-    <div className="space-y-6 pb-20">
-      <div>
-        <h2 className="text-xl font-bold font-bnUI tracking-tight">
-          {uiLang === 'bn' ? 'বিষয়ভিত্তিক সাহিত্য' : 'Explore by Category'}
-        </h2>
-        <p className="text-xs opacity-60 font-bnUI">
-          {uiLang === 'bn' ? 'আপনার পছন্দের বিভাগে নতুন সাহিত্য খুঁজুন' : 'Filter works by poetry, story, or micro-poetry'}
-        </p>
+    <div className="space-y-6 pb-20 max-w-xl mx-auto pt-2">
+      {/* Header & Search */}
+      <div className="space-y-3">
+        <div>
+          <h2 className="text-2xl font-bold font-bnSerif tracking-tight">
+            {uiLang === 'bn' ? 'আবিষ্কার ও অনুসন্ধান' : 'Discover & Search'}
+          </h2>
+          <p className="text-xs opacity-60 font-bnUI">
+            {uiLang === 'bn' ? 'কবিতা, গল্প ও প্রিয় লেখকদের খুঁজুন' : 'Find poems, stories, or authors by name'}
+          </p>
+        </div>
+
+        {/* Global Search Bar (Poem, Story, Author) */}
+        <div className="relative">
+          <Search className="w-4 h-4 opacity-40 absolute left-3.5 top-3" />
+          <input
+            type="text"
+            placeholder={uiLang === 'bn' ? 'কবিতা, গল্প বা লেখকের নাম খুঁজুন...' : 'Search poems, stories, or authors...'}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-10 py-2.5 rounded-2xl border border-theme-main bg-theme-card text-theme-main text-sm font-bnUI focus:outline-none focus:ring-2 focus:ring-emerald-500/50 shadow-sm transition-all"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-3.5 top-2.5 text-xs opacity-50 hover:opacity-100 font-bnUI"
+            >
+              ✕
+            </button>
+          )}
+        </div>
       </div>
 
-      {/* Category Visual Cards Grid */}
+      {/* Category Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {categories.map((cat) => {
           const Icon = cat.icon;
@@ -69,7 +104,7 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({
             <div
               key={cat.id}
               onClick={() => setSelectedCat(cat.id)}
-              className={`p-4 rounded-2xl border bg-gradient-to-br cursor-pointer transition-all ${
+              className={`p-4 rounded-3xl border bg-gradient-to-br cursor-pointer transition-all ${
                 cat.color
               } ${
                 isSelected
@@ -103,23 +138,25 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({
             </span>
           </h3>
           <span className="text-xs opacity-60 font-bnUI">
-            {data?.items.length || 0} {uiLang === 'bn' ? 'টি উপাদান' : 'works'}
+            {filteredItems.length} {uiLang === 'bn' ? 'টি উপাদান' : 'works'}
           </span>
         </div>
 
         {isLoading ? (
           <div className="space-y-3">
             {[1, 2].map((n) => (
-              <div key={n} className="p-5 rounded-2xl border border-theme-main bg-theme-card animate-pulse h-32" />
+              <div key={n} className="p-5 rounded-3xl border border-theme-main bg-theme-card animate-pulse h-32" />
             ))}
           </div>
-        ) : !data || data.items.length === 0 ? (
-          <div className="p-8 text-center rounded-2xl border border-theme-main bg-theme-card opacity-70 font-bnUI text-sm">
-            {t('noResultsFound', uiLang)}
+        ) : filteredItems.length === 0 ? (
+          <div className="p-8 text-center rounded-3xl border border-theme-main bg-theme-card opacity-70 font-bnUI text-sm space-y-1">
+            <UserIcon className="w-8 h-8 mx-auto opacity-40 mb-2" />
+            <p>{t('noResultsFound', uiLang)}</p>
+            <p className="text-xs opacity-60">{uiLang === 'bn' ? 'অন্য নাম বা শব্দ দিয়ে আবার চেষ্টা করুন' : 'Try searching for another keyword or author name'}</p>
           </div>
         ) : (
           <div className="space-y-4">
-            {data.items.map((item) => (
+            {filteredItems.map((item) => (
               <LiteratureCard
                 key={item.id}
                 item={item}
