@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Home, LayoutGrid, Users, BookmarkCheck, User } from 'lucide-react';
 import { useLanguageStore } from '../store/useLanguageStore';
 import { t } from '../utils/translations';
@@ -10,6 +10,23 @@ interface BottomNavProps {
 
 export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onTabChange }) => {
   const { uiLang } = useLanguageStore();
+  const [isVisible, setIsVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      if (currentScrollY > 100 && currentScrollY > lastScrollY) {
+        setIsVisible(false); // Hide bottom nav on scroll down for full screen reading
+      } else {
+        setIsVisible(true); // Show bottom nav on scroll up
+      }
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
 
   const tabs = [
     { id: 'home', labelKey: 'navHome' as const, icon: Home },
@@ -20,7 +37,11 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onTabChange }) 
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-theme-main/95 backdrop-blur-md border-t border-theme-main pb-safe transition-colors duration-200 shadow-lg">
+    <nav
+      className={`fixed bottom-0 left-0 right-0 z-40 bg-theme-main/95 backdrop-blur-md border-t border-theme-main pb-safe transition-transform duration-300 shadow-lg ${
+        isVisible ? 'translate-y-0' : 'translate-y-full'
+      }`}
+    >
       <div className="max-w-md mx-auto flex items-center justify-around h-14 px-2">
         {tabs.map((tab) => {
           const Icon = tab.icon;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Feather, Sun, Coffee, Moon, PlusCircle, LogIn, Globe } from 'lucide-react';
 import { Theme, Language } from '../types';
 import { useAuthStore } from '../store/useAuthStore';
@@ -27,10 +27,32 @@ export const Navbar: React.FC<NavbarProps> = ({
   const { user, isAuthenticated } = useAuthStore();
   const { uiLang, toggleUiLang } = useLanguageStore();
 
+  const [isVisible, setIsVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
   const isWriter = isAuthenticated && (user?.role === 'writer' || user?.role === 'author' || user?.role === 'admin');
 
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      if (currentScrollY > 100 && currentScrollY > lastScrollY) {
+        setIsVisible(false); // Scrolling down -> hide navbar for focus lock
+      } else {
+        setIsVisible(true); // Scrolling up -> show navbar
+      }
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
+
   return (
-    <header className="sticky top-0 z-40 backdrop-blur-md bg-theme-main/90 border-b border-theme-main transition-colors duration-200">
+    <header
+      className={`sticky top-0 z-40 backdrop-blur-md bg-theme-main/90 border-b border-theme-main transition-transform duration-300 ${
+        isVisible ? 'translate-y-0' : '-translate-y-full'
+      }`}
+    >
       <div className="max-w-4xl mx-auto px-4 py-2.5 flex items-center justify-between gap-2">
         {/* Brand Logo */}
         <button
@@ -53,10 +75,10 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* UI Language Toggle (BN / EN) */}
           <button
             onClick={toggleUiLang}
-            className="flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 transition-colors"
+            className="flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 transition-colors"
             title="Switch Interface Language (বাংলা / English)"
           >
-            <Globe className="w-3 h-3" />
+            <Globe className="w-3.5 h-3.5" />
             <span>{uiLang === 'bn' ? 'বাংলা' : 'EN'}</span>
           </button>
 
@@ -64,7 +86,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div className="hidden sm:flex items-center p-0.5 rounded-full bg-gray-500/10 text-xs font-bnUI">
             <button
               onClick={() => onLangFilterChange('all')}
-              className={`px-2 py-0.5 rounded-full text-xs font-medium transition-all ${
+              className={`px-2.5 py-0.5 rounded-full text-xs font-medium transition-all ${
                 langFilter === 'all'
                   ? 'bg-emerald-500 text-white shadow-sm'
                   : 'opacity-70 hover:opacity-100'
@@ -74,7 +96,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
             <button
               onClick={() => onLangFilterChange('bn')}
-              className={`px-2 py-0.5 rounded-full text-xs font-medium transition-all ${
+              className={`px-2.5 py-0.5 rounded-full text-xs font-medium transition-all ${
                 langFilter === 'bn'
                   ? 'bg-emerald-500 text-white shadow-sm'
                   : 'opacity-70 hover:opacity-100'
@@ -84,7 +106,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
             <button
               onClick={() => onLangFilterChange('en')}
-              className={`px-2 py-0.5 rounded-full text-xs font-medium transition-all ${
+              className={`px-2.5 py-0.5 rounded-full text-xs font-medium transition-all ${
                 langFilter === 'en'
                   ? 'bg-emerald-500 text-white shadow-sm font-enUI'
                   : 'opacity-70 hover:opacity-100 font-enUI'
@@ -137,7 +159,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               {isWriter && (
                 <button
                   onClick={onOpenCreate}
-                  className="flex items-center space-x-1 px-2.5 py-1 rounded-full bg-emerald-500 text-white text-xs font-medium hover:bg-emerald-600 transition-colors shadow-sm"
+                  className="flex items-center space-x-1 px-3 py-1 rounded-full bg-emerald-500 text-white text-xs font-medium hover:bg-emerald-600 transition-colors shadow-sm"
                 >
                   <PlusCircle className="w-3.5 h-3.5" />
                   <span className="hidden sm:inline">{t('publishButton', uiLang)}</span>
@@ -158,7 +180,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           ) : (
             <button
               onClick={onOpenAuth}
-              className="flex items-center space-x-1 px-2.5 py-1 rounded-full border border-emerald-500/40 text-emerald-500 text-xs font-medium hover:bg-emerald-500/10 transition-colors"
+              className="flex items-center space-x-1 px-3 py-1 rounded-full border border-emerald-500/40 text-emerald-500 text-xs font-medium hover:bg-emerald-500/10 transition-colors"
             >
               <LogIn className="w-3.5 h-3.5" />
               <span>{t('login', uiLang)}</span>
