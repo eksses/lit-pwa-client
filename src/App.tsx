@@ -4,6 +4,7 @@ import { BottomNav } from './components/BottomNav';
 import { CommentModal } from './components/CommentModal';
 import { CreateLiteratureModal } from './components/CreateLiteratureModal';
 import { AuthModal } from './components/AuthModal';
+import { SettingsModal } from './components/SettingsModal';
 import { ToastContainer } from './components/Toast';
 
 import { HomePage } from './pages/HomePage';
@@ -35,6 +36,7 @@ export default function App() {
   const [commentLiterature, setCommentLiterature] = useState<Literature | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   // Initialize auth check on mount
   useEffect(() => {
@@ -103,10 +105,7 @@ export default function App() {
         <>
           {/* Top Header Navbar */}
           <Navbar
-            theme={theme}
-            onThemeChange={setTheme}
-            langFilter={langFilter}
-            onLangFilterChange={setLangFilter}
+            onOpenSettings={() => setIsSettingsOpen(true)}
             onOpenAuth={() => setIsAuthOpen(true)}
             onOpenCreate={handleCreateClick}
             onNavigateTab={handleTabChange}
@@ -180,6 +179,15 @@ export default function App() {
       <AuthModal
         isOpen={isAuthOpen}
         onClose={() => setIsAuthOpen(false)}
+      />
+
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        theme={theme}
+        onThemeChange={setTheme}
+        langFilter={langFilter}
+        onLangFilterChange={setLangFilter}
       />
 
       <ToastContainer />
