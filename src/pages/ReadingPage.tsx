@@ -82,7 +82,7 @@ export const ReadingPage: React.FC<ReadingPageProps> = ({
   return (
     <div className="min-h-screen bg-theme-main text-theme-main transition-colors duration-200 pb-24">
       {/* Sticky Reader Header Navigation */}
-      <header className="sticky top-0 z-30 bg-theme-main/90 backdrop-blur-md border-b border-theme-main px-4 py-3 flex items-center justify-between">
+      <header className="sticky top-0 z-30 bg-theme-main/90 backdrop-blur-md border-b border-theme-main px-4 py-3 flex items-center justify-between pt-safe px-safe">
         <button
           onClick={onBack}
           className="flex items-center space-x-1 p-1.5 rounded-full hover:bg-gray-500/10 transition-colors"
@@ -213,7 +213,7 @@ export const ReadingPage: React.FC<ReadingPageProps> = ({
       </main>
 
       {/* Reader Bottom Fixed Bar */}
-      <footer className="fixed bottom-0 left-0 right-0 z-30 bg-theme-main/95 backdrop-blur-md border-t border-theme-main py-2.5 px-4 shadow-lg">
+      <footer className="fixed bottom-0 left-0 right-0 z-30 bg-theme-main/95 backdrop-blur-md border-t border-theme-main py-2.5 px-4 shadow-lg pb-safe px-safe">
         <div className="max-w-md mx-auto flex items-center justify-around">
           {/* Like */}
           <button

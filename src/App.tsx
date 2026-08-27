@@ -112,8 +112,8 @@ export default function App() {
             onNavigateTab={handleTabChange}
           />
 
-          {/* Main App Page View Container */}
-          <main className="max-w-3xl mx-auto px-4 py-5">
+          {/* Main App Page Views */}
+          <main className="max-w-4xl mx-auto px-4 py-4 pb-24 px-safe pb-safe">
             {activeTab === 'home' && (
               <HomePage
                 langFilter={langFilter}
