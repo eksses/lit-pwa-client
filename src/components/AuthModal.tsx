@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, LogIn, UserPlus, Lock, Mail, User as UserIcon, AtSign, PenTool, BookOpen } from 'lucide-react';
+import { X, LogIn, UserPlus, Lock, Mail, User as UserIcon, AtSign, PenTool, BookOpen, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
 import { useAuthStore } from '../store/useAuthStore';
 import { useLanguageStore } from '../store/useLanguageStore';
 import { t } from '../utils/translations';
@@ -16,6 +16,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   const [tab, setTab] = useState<'login' | 'register'>('login');
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
+  // Password visibility toggles
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Register state
   const [name, setName] = useState('');
@@ -32,14 +37,18 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
-    if (!identifier || !password) return;
+    if (!identifier.trim() || !password) return;
 
     setIsSubmitting(true);
     try {
-      await login({ identifier, password });
+      await login({ identifier: identifier.trim(), password });
       onClose();
     } catch (err: any) {
-      setErrorMsg(err.response?.data?.error || err.response?.data?.message || (uiLang === 'bn' ? 'লগইন ব্যর্থ হয়েছে।' : 'Login failed. Check credentials.'));
+      setErrorMsg(
+        err.response?.data?.error ||
+          err.response?.data?.message ||
+          (uiLang === 'bn' ? 'লগইন ব্যর্থ হয়েছে। তথ্য যাচাই করুন।' : 'Login failed. Check credentials.')
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -48,14 +57,46 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   const handleRegisterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
-    if (!name || !username || !email || !password) return;
+
+    if (!name.trim() || !username.trim() || !email.trim() || !password) return;
+
+    if (password.length < 6) {
+      setErrorMsg(
+        uiLang === 'bn'
+          ? 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।'
+          : 'Password must be at least 6 characters long.'
+      );
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setErrorMsg(
+        uiLang === 'bn'
+          ? 'পাসওয়ার্ড এবং কনফার্ম পাসওয়ার্ড মিলছে না।'
+          : 'Passwords do not match.'
+      );
+      return;
+    }
 
     setIsSubmitting(true);
     try {
-      await register({ name, username, email, password, bio, role });
+      await register({
+        name: name.trim(),
+        username: username.trim().toLowerCase(),
+        email: email.trim().toLowerCase(),
+        password,
+        bio: bio.trim(),
+        role,
+      });
       onClose();
     } catch (err: any) {
-      setErrorMsg(err.response?.data?.error || err.response?.data?.message || (uiLang === 'bn' ? 'রেজিস্ট্রেশন ব্যর্থ হয়েছে।' : 'Registration failed. Try another username/email.'));
+      setErrorMsg(
+        err.response?.data?.error ||
+          err.response?.data?.message ||
+          (uiLang === 'bn'
+            ? 'রেজিস্ট্রেশন ব্যর্থ হয়েছে। অন্য ইউজারনেম/ইমেইল চেষ্টা করুন।'
+            : 'Registration failed. Try another username/email.')
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -127,7 +168,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                     required
                     placeholder="username or email"
                     value={identifier}
-                    onChange={(e) => setIdentifier(e.target.value)}
+                    onChange={(e) => {
+                      setIdentifier(e.target.value);
+                      setErrorMsg('');
+                    }}
                     className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-theme-main bg-theme-main text-theme-main text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                   />
                 </div>
@@ -140,13 +184,24 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                 <div className="relative">
                   <Lock className="w-4 h-4 opacity-50 absolute left-3 top-3" />
                   <input
-                    type="password"
+                    type={showPassword ? 'text' : 'password'}
                     required
                     placeholder="••••••••"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-theme-main bg-theme-main text-theme-main text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      setErrorMsg('');
+                    }}
+                    className="w-full pl-9 pr-10 py-2.5 rounded-xl border border-theme-main bg-theme-main text-theme-main text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-3 opacity-60 hover:opacity-100 transition-opacity"
+                    title={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
                 </div>
               </div>
 
@@ -246,6 +301,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                 </div>
               </div>
 
+              {/* Password */}
               <div>
                 <label className="block text-xs font-semibold opacity-75 mb-1 font-bnUI">
                   {t('password', uiLang)}
@@ -253,13 +309,63 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                 <div className="relative">
                   <Lock className="w-4 h-4 opacity-50 absolute left-3 top-3" />
                   <input
-                    type="password"
+                    type={showPassword ? 'text' : 'password'}
                     required
                     placeholder="••••••••"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 rounded-xl border border-theme-main bg-theme-main text-theme-main text-sm font-enUI focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      setErrorMsg('');
+                    }}
+                    className="w-full pl-9 pr-10 py-2 rounded-xl border border-theme-main bg-theme-main text-theme-main text-sm font-enUI focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-2.5 opacity-60 hover:opacity-100 transition-opacity"
+                    title={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Confirm Password */}
+              <div>
+                <label className="block text-xs font-semibold opacity-75 mb-1 font-bnUI flex items-center justify-between">
+                  <span>{uiLang === 'bn' ? 'পাসওয়ার্ড নিশ্চিত করুন' : 'Confirm Password'}</span>
+                  {confirmPassword && password === confirmPassword && (
+                    <span className="text-emerald-500 text-[10px] flex items-center space-x-0.5">
+                      <CheckCircle2 className="w-3 h-3" />
+                      <span>{uiLang === 'bn' ? 'মিলেছে' : 'Matched'}</span>
+                    </span>
+                  )}
+                </label>
+                <div className="relative">
+                  <Lock className="w-4 h-4 opacity-50 absolute left-3 top-3" />
+                  <input
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    required
+                    placeholder="••••••••"
+                    value={confirmPassword}
+                    onChange={(e) => {
+                      setConfirmPassword(e.target.value);
+                      setErrorMsg('');
+                    }}
+                    className={`w-full pl-9 pr-10 py-2 rounded-xl border bg-theme-main text-theme-main text-sm font-enUI focus:outline-none focus:ring-2 focus:ring-emerald-500/50 ${
+                      confirmPassword && password !== confirmPassword
+                        ? 'border-rose-500/60'
+                        : 'border-theme-main'
+                    }`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-2.5 opacity-60 hover:opacity-100 transition-opacity"
+                    title={showConfirmPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
                 </div>
               </div>
 
