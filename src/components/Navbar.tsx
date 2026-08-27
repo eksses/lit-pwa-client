@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Feather, Sun, Coffee, Moon, PlusCircle, LogIn, Globe } from 'lucide-react';
 import { Theme, Language } from '../types';
 import { useAuthStore } from '../store/useAuthStore';
@@ -27,33 +27,11 @@ export const Navbar: React.FC<NavbarProps> = ({
   const { user, isAuthenticated } = useAuthStore();
   const { uiLang, toggleUiLang } = useLanguageStore();
 
-  const [isVisible, setIsVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
-
   const isWriter = isAuthenticated && (user?.role === 'writer' || user?.role === 'author' || user?.role === 'admin');
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      if (currentScrollY > 100 && currentScrollY > lastScrollY) {
-        setIsVisible(false); // Scrolling down -> hide navbar for focus lock
-      } else {
-        setIsVisible(true); // Scrolling up -> show navbar
-      }
-      setLastScrollY(currentScrollY);
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [lastScrollY]);
-
   return (
-    <header
-      className={`sticky top-0 z-40 backdrop-blur-md bg-theme-main/90 border-b border-theme-main transition-transform duration-300 ${
-        isVisible ? 'translate-y-0' : '-translate-y-full'
-      }`}
-    >
-      <div className="max-w-4xl mx-auto px-4 py-2.5 flex items-center justify-between gap-2">
+    <header className="sticky top-0 z-40 backdrop-blur-md bg-theme-main/90 border-b border-theme-main/60 transition-colors duration-200">
+      <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
         {/* Brand Logo */}
         <button
           onClick={() => onNavigateTab('home')}
@@ -66,12 +44,12 @@ export const Navbar: React.FC<NavbarProps> = ({
             <h1 className="text-base font-bold font-bnUI tracking-tight leading-tight group-hover:text-emerald-500 transition-colors">
               {t('appName', uiLang)}
             </h1>
-            <p className="text-[10px] opacity-60 font-enUI leading-none">kavya & katha</p>
+            <p className="text-[10px] opacity-50 font-enUI leading-none">kavya & katha</p>
           </div>
         </button>
 
         {/* Right Actions */}
-        <div className="flex items-center space-x-1.5 sm:space-x-2">
+        <div className="flex items-center space-x-2">
           {/* UI Language Toggle (BN / EN) */}
           <button
             onClick={toggleUiLang}
@@ -81,40 +59,6 @@ export const Navbar: React.FC<NavbarProps> = ({
             <Globe className="w-3.5 h-3.5" />
             <span>{uiLang === 'bn' ? 'বাংলা' : 'EN'}</span>
           </button>
-
-          {/* Content Language Selector Pills */}
-          <div className="hidden sm:flex items-center p-0.5 rounded-full bg-gray-500/10 text-xs font-bnUI">
-            <button
-              onClick={() => onLangFilterChange('all')}
-              className={`px-2.5 py-0.5 rounded-full text-xs font-medium transition-all ${
-                langFilter === 'all'
-                  ? 'bg-emerald-500 text-white shadow-sm'
-                  : 'opacity-70 hover:opacity-100'
-              }`}
-            >
-              {t('all', uiLang)}
-            </button>
-            <button
-              onClick={() => onLangFilterChange('bn')}
-              className={`px-2.5 py-0.5 rounded-full text-xs font-medium transition-all ${
-                langFilter === 'bn'
-                  ? 'bg-emerald-500 text-white shadow-sm'
-                  : 'opacity-70 hover:opacity-100'
-              }`}
-            >
-              BN
-            </button>
-            <button
-              onClick={() => onLangFilterChange('en')}
-              className={`px-2.5 py-0.5 rounded-full text-xs font-medium transition-all ${
-                langFilter === 'en'
-                  ? 'bg-emerald-500 text-white shadow-sm font-enUI'
-                  : 'opacity-70 hover:opacity-100 font-enUI'
-              }`}
-            >
-              EN
-            </button>
-          </div>
 
           {/* Theme Switcher Toggle */}
           <div className="flex items-center p-0.5 rounded-lg bg-gray-500/10">
@@ -155,7 +99,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* Auth & Writer Actions */}
           {isAuthenticated && user ? (
-            <div className="flex items-center space-x-1.5">
+            <div className="flex items-center space-x-2">
               {isWriter && (
                 <button
                   onClick={onOpenCreate}

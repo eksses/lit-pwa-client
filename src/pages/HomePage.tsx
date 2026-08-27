@@ -55,22 +55,22 @@ export const HomePage: React.FC<HomePageProps> = ({
   });
 
   return (
-    <div className="space-y-4 pb-20">
-      {/* Top Banner / Search Bar */}
-      <div className="space-y-3">
+    <div className="space-y-5 pb-20 max-w-2xl mx-auto">
+      {/* Clean Header & Search */}
+      <div className="space-y-3 pt-2">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-bold font-bnUI tracking-tight">
-              {uiLang === 'bn' ? 'সাহিত্য ফিড' : 'Literature Feed'}
+            <h2 className="text-2xl font-bold font-bnSerif tracking-tight">
+              {uiLang === 'bn' ? 'নির্বাক সাহিত্য' : 'Nirbak Literature'}
             </h2>
             <p className="text-xs opacity-60 font-bnUI">
-              {uiLang === 'bn' ? 'অনলাইন ও অফলাইনে সাহিত্য পাঠের ডিজিটাল ঘর' : 'Discover poetry, fiction & stories'}
+              {uiLang === 'bn' ? 'কবিতা, গল্প ও সাহিত্য ভাবনার স্থান' : 'Sanctuary for poetry and short fiction'}
             </p>
           </div>
           {isWriter && (
             <button
               onClick={onOpenCreate}
-              className="flex items-center space-x-1 px-3 py-1.5 rounded-full bg-emerald-500 text-white text-xs font-medium hover:bg-emerald-600 transition-colors shadow-sm"
+              className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full bg-emerald-500 text-white text-xs font-semibold hover:bg-emerald-600 transition-all shadow-sm"
             >
               <Feather className="w-3.5 h-3.5" />
               <span>{t('publishHeader', uiLang)}</span>
@@ -80,38 +80,38 @@ export const HomePage: React.FC<HomePageProps> = ({
 
         {/* Search Bar Input */}
         <div className="relative">
-          <Search className="w-4 h-4 opacity-50 absolute left-3.5 top-3" />
+          <Search className="w-4 h-4 opacity-40 absolute left-3.5 top-3" />
           <input
             type="text"
             placeholder={t('searchPlaceholder', uiLang)}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-theme-main bg-theme-card text-theme-main text-sm font-bnUI focus:outline-none focus:ring-2 focus:ring-emerald-500/50 shadow-sm transition-all"
+            className="w-full pl-10 pr-10 py-2.5 rounded-2xl border border-theme-main bg-theme-card text-theme-main text-sm font-bnUI focus:outline-none focus:ring-2 focus:ring-emerald-500/50 shadow-sm transition-all"
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
               className="absolute right-3.5 top-2.5 text-xs opacity-50 hover:opacity-100 font-bnUI"
             >
-              {uiLang === 'bn' ? 'মুছে ফেলুন' : 'Clear'}
+              ✕
             </button>
           )}
         </div>
 
-        {/* Feed Algorithm & Category Controls */}
-        <div className="space-y-2">
-          {/* Category Pill Tabs */}
-          <div className="flex items-center space-x-2 overflow-x-auto pb-1 no-scrollbar text-xs font-bnUI">
+        {/* Clean Category & Filter Bar */}
+        <div className="flex items-center justify-between gap-2 pt-1 border-b border-theme-main/40 pb-2.5">
+          {/* Category Pills */}
+          <div className="flex items-center space-x-1.5 overflow-x-auto no-scrollbar text-xs font-bnUI">
             {categories.map((cat) => {
               const isActive = selectedCategory === cat.id;
               return (
                 <button
                   key={cat.id}
                   onClick={() => setSelectedCategory(cat.id as any)}
-                  className={`px-3.5 py-1.5 rounded-full whitespace-nowrap font-medium transition-all ${
+                  className={`px-3 py-1 rounded-full whitespace-nowrap font-medium transition-all ${
                     isActive
-                      ? 'bg-emerald-500 text-white shadow-sm'
-                      : 'bg-theme-card border border-theme-main opacity-80 hover:opacity-100'
+                      ? 'bg-emerald-500 text-white shadow-sm font-semibold'
+                      : 'opacity-70 hover:opacity-100 hover:bg-gray-500/10'
                   }`}
                 >
                   {cat.label}
@@ -120,58 +120,46 @@ export const HomePage: React.FC<HomePageProps> = ({
             })}
           </div>
 
-          {/* Algorithm Feed Sorting Bar */}
-          <div className="flex items-center justify-between pt-1 font-bnUI border-b border-theme-main/40 pb-2">
-            <div className="flex items-center space-x-1.5 text-xs">
-              <button
-                onClick={() => setSortAlgo('trending')}
-                className={`px-3 py-1 rounded-full transition-all flex items-center space-x-1 ${
-                  sortAlgo === 'trending'
-                    ? 'bg-emerald-500/15 text-emerald-500 font-bold border border-emerald-500/30 shadow-sm'
-                    : 'opacity-60 hover:opacity-100'
-                }`}
-              >
-                <TrendingUp className="w-3.5 h-3.5" />
-                <span>{uiLang === 'bn' ? 'জনপ্রিয়' : 'Trending'}</span>
-              </button>
-              <button
-                onClick={() => setSortAlgo('latest')}
-                className={`px-3 py-1 rounded-full transition-all flex items-center space-x-1 ${
-                  sortAlgo === 'latest'
-                    ? 'bg-emerald-500/15 text-emerald-500 font-bold border border-emerald-500/30 shadow-sm'
-                    : 'opacity-60 hover:opacity-100'
-                }`}
-              >
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>{uiLang === 'bn' ? 'সাম্প্রতিক' : 'Latest'}</span>
-              </button>
-              <button
-                onClick={() => setSortAlgo('top')}
-                className={`px-3 py-1 rounded-full transition-all flex items-center space-x-1 ${
-                  sortAlgo === 'top'
-                    ? 'bg-emerald-500/15 text-emerald-500 font-bold border border-emerald-500/30 shadow-sm'
-                    : 'opacity-60 hover:opacity-100'
-                }`}
-              >
-                <Flame className="w-3.5 h-3.5 text-amber-500" />
-                <span>{uiLang === 'bn' ? 'সেরা' : 'Top Rated'}</span>
-              </button>
-            </div>
-
-            <span className="text-[11px] opacity-50 font-bnUI hidden sm:inline">
-              {filteredItems.length} {uiLang === 'bn' ? 'টি লেখা' : 'works'}
-            </span>
+          {/* Feed Algorithm Sort Selector */}
+          <div className="flex items-center space-x-1 text-xs font-bnUI shrink-0">
+            <button
+              onClick={() => setSortAlgo('trending')}
+              className={`p-1.5 rounded-lg transition-colors ${
+                sortAlgo === 'trending' ? 'text-emerald-500 bg-emerald-500/10' : 'opacity-50 hover:opacity-100'
+              }`}
+              title={uiLang === 'bn' ? 'জনপ্রিয়' : 'Trending'}
+            >
+              <TrendingUp className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setSortAlgo('latest')}
+              className={`p-1.5 rounded-lg transition-colors ${
+                sortAlgo === 'latest' ? 'text-emerald-500 bg-emerald-500/10' : 'opacity-50 hover:opacity-100'
+              }`}
+              title={uiLang === 'bn' ? 'সাম্প্রতিক' : 'Latest'}
+            >
+              <Sparkles className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setSortAlgo('top')}
+              className={`p-1.5 rounded-lg transition-colors ${
+                sortAlgo === 'top' ? 'text-amber-500 bg-amber-500/10' : 'opacity-50 hover:opacity-100'
+              }`}
+              title={uiLang === 'bn' ? 'সেরা' : 'Top Rated'}
+            >
+              <Flame className="w-4 h-4" />
+            </button>
           </div>
         </div>
       </div>
 
-      {/* Main Literature Feed List */}
+      {/* Literature Feed List */}
       {isLoading ? (
         <div className="space-y-4">
           {[1, 2, 3].map((n) => (
             <div
               key={n}
-              className="p-5 rounded-2xl border border-theme-main bg-theme-card space-y-3 animate-pulse"
+              className="p-6 rounded-3xl border border-theme-main bg-theme-card space-y-3 animate-pulse"
             >
               <div className="flex items-center space-x-3">
                 <div className="w-9 h-9 rounded-full bg-gray-500/20" />
@@ -189,7 +177,7 @@ export const HomePage: React.FC<HomePageProps> = ({
           ))}
         </div>
       ) : isError ? (
-        <div className="p-8 text-center rounded-2xl border border-theme-main bg-theme-card space-y-3">
+        <div className="p-8 text-center rounded-3xl border border-theme-main bg-theme-card space-y-3">
           <p className="text-sm font-bnUI text-rose-500">
             {uiLang === 'bn' ? 'ফিড লোড করতে সমস্যা হয়েছে।' : 'Failed to load literature feed.'}
           </p>
@@ -202,7 +190,7 @@ export const HomePage: React.FC<HomePageProps> = ({
           </button>
         </div>
       ) : filteredItems.length === 0 ? (
-        <div className="p-10 text-center rounded-2xl border border-theme-main bg-theme-card space-y-3">
+        <div className="p-10 text-center rounded-3xl border border-theme-main bg-theme-card space-y-3">
           <Sparkles className="w-10 h-10 text-emerald-500/40 mx-auto" />
           <h3 className="text-base font-bold font-bnUI">{t('noResultsFound', uiLang)}</h3>
           <p className="text-xs opacity-60 font-bnUI max-w-xs mx-auto">
