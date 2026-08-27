@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Feather, Sparkles } from 'lucide-react';
+import { X, Feather, Sparkles, BookOpen, Layers } from 'lucide-react';
 import { Category, Language } from '../types';
 import { useCreateLiterature } from '../hooks/useLiterature';
 import { useLanguageStore } from '../store/useLanguageStore';
@@ -18,17 +18,22 @@ export const CreateLiteratureModal: React.FC<CreateLiteratureModalProps> = ({
   const { uiLang } = useLanguageStore();
 
   const [title, setTitle] = useState('');
+  const [partNumber, setPartNumber] = useState('');
   const [content, setContent] = useState('');
   const [category, setCategory] = useState<Category>('poem');
   const [language, setLanguage] = useState<Language>('bn');
-  const [readingTimeMin, setReadingTimeMin] = useState<number>(2);
+  const [wordCount, setWordCount] = useState(0);
+  const [readingTimeMin, setReadingTimeMin] = useState<number>(1);
 
   if (!isOpen) return null;
 
-  // Auto estimate reading time based on word count
+  const isSerialOrNovel = category === 'serial_story' || category === 'novel';
+
+  // Auto estimate reading time and word count based on content text
   const handleContentChange = (text: string) => {
     setContent(text);
-    const words = text.trim().split(/\s+/).length;
+    const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+    setWordCount(words);
     const estimated = Math.max(1, Math.ceil(words / 150));
     setReadingTimeMin(estimated);
   };
@@ -37,9 +42,17 @@ export const CreateLiteratureModal: React.FC<CreateLiteratureModalProps> = ({
     e.preventDefault();
     if (!title.trim() || !content.trim()) return;
 
+    let finalTitle = title.trim();
+    if (isSerialOrNovel && partNumber.trim()) {
+      const partPrefix = language === 'bn' ? `[পর্ব ${partNumber.trim()}]` : `[Part ${partNumber.trim()}]`;
+      if (!finalTitle.includes(partPrefix)) {
+        finalTitle = `${partPrefix} ${finalTitle}`;
+      }
+    }
+
     createLiteratureMutation.mutate(
       {
-        title: title.trim(),
+        title: finalTitle,
         content: content.trim(),
         category,
         language,
@@ -48,6 +61,7 @@ export const CreateLiteratureModal: React.FC<CreateLiteratureModalProps> = ({
       {
         onSuccess: () => {
           setTitle('');
+          setPartNumber('');
           setContent('');
           onClose();
         },
@@ -56,9 +70,9 @@ export const CreateLiteratureModal: React.FC<CreateLiteratureModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 pt-safe pb-safe px-safe animate-in fade-in duration-200">
       <div
-        className="w-full max-w-xl bg-theme-card text-theme-main border border-theme-main rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+        className="w-full max-w-xl bg-theme-card text-theme-main border border-theme-main rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
@@ -78,13 +92,13 @@ export const CreateLiteratureModal: React.FC<CreateLiteratureModalProps> = ({
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-5 space-y-4">
           {createLiteratureMutation.isError && (
-            <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-500 text-xs font-bnUI">
+            <div className="p-3 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-500 text-xs font-bnUI">
               {uiLang === 'bn' ? 'লেখা প্রকাশ করতে ব্যর্থ হয়েছে। পুনরায় চেষ্টা করুন।' : 'Failed to publish work. Please try again.'}
             </div>
           )}
 
           {/* Category & Language Selection */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-semibold opacity-75 mb-1 font-bnUI">
                 {t('categoryLabel', uiLang)}
@@ -92,17 +106,17 @@ export const CreateLiteratureModal: React.FC<CreateLiteratureModalProps> = ({
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value as Category)}
-                className="w-full px-3 py-2 rounded-xl border border-theme-main bg-theme-main text-theme-main text-xs font-bnUI focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                className="w-full px-3 py-2.5 rounded-xl border border-theme-main bg-theme-main text-theme-main text-xs font-bnUI focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
               >
-                <option value="poem" className="bg-theme-card text-theme-main">{t('poems', uiLang)}</option>
-                <option value="story" className="bg-theme-card text-theme-main">{t('stories', uiLang)}</option>
-                <option value="micro_poem" className="bg-theme-card text-theme-main">{t('microPoetry', uiLang)}</option>
-                <option value="prose_poetry" className="bg-theme-card text-theme-main">{t('prosePoetry', uiLang)}</option>
-                <option value="novel" className="bg-theme-card text-theme-main">{t('novel', uiLang)}</option>
-                <option value="serial_story" className="bg-theme-card text-theme-main">{t('serialStory', uiLang)}</option>
-                <option value="long_story" className="bg-theme-card text-theme-main">{t('longStory', uiLang)}</option>
-                <option value="collection" className="bg-theme-card text-theme-main">{t('collection', uiLang)}</option>
-                <option value="uncategorized" className="bg-theme-card text-theme-main">{t('uncategorized', uiLang)}</option>
+                <option value="poem" className="bg-theme-card text-theme-main">📜 {t('poems', uiLang)}</option>
+                <option value="story" className="bg-theme-card text-theme-main">📖 {t('stories', uiLang)}</option>
+                <option value="micro_poem" className="bg-theme-card text-theme-main">✒️ {t('microPoetry', uiLang)}</option>
+                <option value="prose_poetry" className="bg-theme-card text-theme-main">✍️ {t('prosePoetry', uiLang)}</option>
+                <option value="novel" className="bg-theme-card text-theme-main">📚 {t('novel', uiLang)}</option>
+                <option value="serial_story" className="bg-theme-card text-theme-main">🔖 {t('serialStory', uiLang)}</option>
+                <option value="long_story" className="bg-theme-card text-theme-main">📜 {t('longStory', uiLang)}</option>
+                <option value="collection" className="bg-theme-card text-theme-main">🎨 {t('collection', uiLang)}</option>
+                <option value="uncategorized" className="bg-theme-card text-theme-main">📂 {t('uncategorized', uiLang)}</option>
               </select>
             </div>
 
@@ -113,13 +127,33 @@ export const CreateLiteratureModal: React.FC<CreateLiteratureModalProps> = ({
               <select
                 value={language}
                 onChange={(e) => setLanguage(e.target.value as Language)}
-                className="w-full px-3 py-2 rounded-xl border border-theme-main bg-theme-main text-theme-main text-xs font-bnUI focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                className="w-full px-3 py-2.5 rounded-xl border border-theme-main bg-theme-main text-theme-main text-xs font-bnUI focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
               >
                 <option value="bn" className="bg-theme-card text-theme-main">বাংলা (Bangla)</option>
                 <option value="en" className="bg-theme-card text-theme-main">English</option>
               </select>
             </div>
           </div>
+
+          {/* Serial / Part Number (Conditional for Serials & Novels) */}
+          {isSerialOrNovel && (
+            <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 space-y-1.5 animate-in fade-in duration-200">
+              <label className="block text-xs font-bold text-emerald-500 font-bnUI flex items-center space-x-1">
+                <Layers className="w-3.5 h-3.5" />
+                <span>{uiLang === 'bn' ? 'ধারাবাহিক পর্ব নম্বর (ঐচ্ছিক)' : 'Episode / Part Number (Optional)'}</span>
+              </label>
+              <input
+                type="text"
+                placeholder={uiLang === 'bn' ? 'যেমন: ১, ২, ৩...' : 'e.g. 1, 2, 3...'}
+                value={partNumber}
+                onChange={(e) => setPartNumber(e.target.value)}
+                className="w-full px-3 py-1.5 rounded-xl border border-theme-main bg-theme-main text-theme-main text-xs font-bnUI focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+              />
+              <p className="text-[11px] opacity-60 font-bnUI">
+                {uiLang === 'bn' ? 'পর্ব নম্বর দিলে এটি পাঠকের পর্বসূচিতে ধারাবাহিকভাবে প্রদর্শিত হবে' : 'Adding a part number organizes chapters sequentially in the Episode Index'}
+              </p>
+            </div>
+          )}
 
           {/* Title */}
           <div>
@@ -138,23 +172,25 @@ export const CreateLiteratureModal: React.FC<CreateLiteratureModalProps> = ({
             />
           </div>
 
-          {/* Content */}
+          {/* Content & Real-time Live Counters */}
           <div>
             <div className="flex items-center justify-between mb-1">
               <label className="block text-xs font-semibold opacity-75 font-bnUI">
                 {t('contentLabel', uiLang)}
               </label>
-              <span className="text-[11px] opacity-60 font-bnUI">
-                {readingTimeMin} {t('readTime', uiLang)}
-              </span>
+              <div className="flex items-center space-x-2 text-[11px] opacity-65 font-bnUI">
+                <span>{wordCount} {uiLang === 'bn' ? 'শব্দ' : 'words'}</span>
+                <span>•</span>
+                <span>{readingTimeMin} {t('readTime', uiLang)}</span>
+              </div>
             </div>
             <textarea
               required
               rows={8}
               placeholder={
                 language === 'bn'
-                  ? 'আপনার কবিতা বা গল্পের পর্বগুলো লিখুন...'
-                  : 'Write your literature lines here...'
+                  ? 'আপনার কবিতা, গল্প বা উপন্যাস পর্বের মূল অংশ লিখুন...'
+                  : 'Write your poem, story, or chapter text here...'
               }
               value={content}
               onChange={(e) => handleContentChange(e.target.value)}
@@ -164,7 +200,7 @@ export const CreateLiteratureModal: React.FC<CreateLiteratureModalProps> = ({
             />
           </div>
 
-          {/* Submit Action */}
+          {/* Submit Action Bar */}
           <div className="pt-3 border-t border-theme-main flex items-center justify-end space-x-2">
             <button
               type="button"
