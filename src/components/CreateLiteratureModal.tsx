@@ -98,6 +98,10 @@ export const CreateLiteratureModal: React.FC<CreateLiteratureModalProps> = ({
                 <option value="story" className="bg-theme-card text-theme-main">{t('stories', uiLang)}</option>
                 <option value="micro_poem" className="bg-theme-card text-theme-main">{t('microPoetry', uiLang)}</option>
                 <option value="prose_poetry" className="bg-theme-card text-theme-main">{t('prosePoetry', uiLang)}</option>
+                <option value="novel" className="bg-theme-card text-theme-main">{t('novel', uiLang)}</option>
+                <option value="serial_story" className="bg-theme-card text-theme-main">{t('serialStory', uiLang)}</option>
+                <option value="long_story" className="bg-theme-card text-theme-main">{t('longStory', uiLang)}</option>
+                <option value="collection" className="bg-theme-card text-theme-main">{t('collection', uiLang)}</option>
                 <option value="uncategorized" className="bg-theme-card text-theme-main">{t('uncategorized', uiLang)}</option>
               </select>
             </div>

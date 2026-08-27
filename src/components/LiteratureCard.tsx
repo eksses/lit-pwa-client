@@ -34,6 +34,10 @@ export const LiteratureCard: React.FC<LiteratureCardProps> = ({
     story: t('stories', uiLang),
     micro_poem: t('microPoetry', uiLang),
     prose_poetry: t('prosePoetry', uiLang),
+    novel: t('novel', uiLang),
+    serial_story: t('serialStory', uiLang),
+    long_story: t('longStory', uiLang),
+    collection: t('collection', uiLang),
     uncategorized: t('uncategorized', uiLang),
     other: t('uncategorized', uiLang),
   };

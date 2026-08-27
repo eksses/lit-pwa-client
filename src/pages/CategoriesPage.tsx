@@ -38,6 +38,10 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({
     { id: 'story', label: t('stories', uiLang), icon: BookOpen },
     { id: 'micro_poem', label: t('microPoetry', uiLang), icon: Scroll },
     { id: 'prose_poetry', label: t('prosePoetry', uiLang), icon: Feather },
+    { id: 'novel', label: t('novel', uiLang), icon: BookOpen },
+    { id: 'serial_story', label: t('serialStory', uiLang), icon: Scroll },
+    { id: 'long_story', label: t('longStory', uiLang), icon: BookOpen },
+    { id: 'collection', label: t('collection', uiLang), icon: Sparkles },
     { id: 'uncategorized', label: t('uncategorized', uiLang), icon: BookOpen },
     { id: 'authors', label: uiLang === 'bn' ? 'লেখকবৃন্দ' : 'Authors', icon: Users },
   ];
