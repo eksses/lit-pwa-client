@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Search, Sparkles, RefreshCw, Feather } from 'lucide-react';
 import { Category, Language, Literature } from '../types';
 import { useLiteratureList } from '../hooks/useLiterature';
+import { useAuthStore } from '../store/useAuthStore';
 import { useLanguageStore } from '../store/useLanguageStore';
 import { t } from '../utils/translations';
 import { LiteratureCard } from '../components/LiteratureCard';
@@ -23,7 +24,11 @@ export const HomePage: React.FC<HomePageProps> = ({
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<'all' | Category>('all');
   const [searchQuery, setSearchQuery] = useState('');
+
+  const { user, isAuthenticated } = useAuthStore();
   const { uiLang } = useLanguageStore();
+
+  const isWriter = isAuthenticated && (user?.role === 'writer' || user?.role === 'author' || user?.role === 'admin');
 
   const { data, isLoading, isError, refetch } = useLiteratureList({
     category: selectedCategory === 'all' ? undefined : selectedCategory,
@@ -60,13 +65,15 @@ export const HomePage: React.FC<HomePageProps> = ({
               {uiLang === 'bn' ? 'অনলাইন ও অফলাইনে সাহিত্য পাঠের ডিজিটাল ঘর' : 'Discover poetry, fiction & stories'}
             </p>
           </div>
-          <button
-            onClick={onOpenCreate}
-            className="flex items-center space-x-1 px-3 py-1.5 rounded-full bg-emerald-500 text-white text-xs font-medium hover:bg-emerald-600 transition-colors shadow-sm"
-          >
-            <Feather className="w-3.5 h-3.5" />
-            <span>{t('publishHeader', uiLang)}</span>
-          </button>
+          {isWriter && (
+            <button
+              onClick={onOpenCreate}
+              className="flex items-center space-x-1 px-3 py-1.5 rounded-full bg-emerald-500 text-white text-xs font-medium hover:bg-emerald-600 transition-colors shadow-sm"
+            >
+              <Feather className="w-3.5 h-3.5" />
+              <span>{t('publishHeader', uiLang)}</span>
+            </button>
+          )}
         </div>
 
         {/* Search Bar Input */}
@@ -152,15 +159,17 @@ export const HomePage: React.FC<HomePageProps> = ({
           <h3 className="text-base font-bold font-bnUI">{t('noResultsFound', uiLang)}</h3>
           <p className="text-xs opacity-60 font-bnUI max-w-xs mx-auto">
             {uiLang === 'bn'
-              ? 'আপনার নির্বাচন করা বিভাগ বা ভাষায় এখনো কোনো লেখা নেই। প্রথম লেখাটি আপনিই প্রকাশ করতে পারেন!'
-              : 'No literature found for this category or filter. Publish the first one!'}
+              ? 'আপনার নির্বাচন করা বিভাগ বা ভাষায় এখনো কোনো লেখা নেই।'
+              : 'No literature found for this category or filter.'}
           </p>
-          <button
-            onClick={onOpenCreate}
-            className="px-4 py-2 rounded-xl bg-emerald-500 text-white text-xs font-medium font-bnUI shadow-sm inline-block"
-          >
-            {t('publishHeader', uiLang)}
-          </button>
+          {isWriter && (
+            <button
+              onClick={onOpenCreate}
+              className="px-4 py-2 rounded-xl bg-emerald-500 text-white text-xs font-medium font-bnUI shadow-sm inline-block"
+            >
+              {t('publishHeader', uiLang)}
+            </button>
+          )}
         </div>
       ) : (
         <div className="space-y-4">
