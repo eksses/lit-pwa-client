@@ -4,6 +4,7 @@ import { Literature } from '../types';
 import { useToggleLike } from '../hooks/useLiterature';
 import { useReaderStore } from '../store/useReaderStore';
 import { useLanguageStore } from '../store/useLanguageStore';
+import { useToastStore } from '../store/useToastStore';
 import { t } from '../utils/translations';
 
 interface LiteratureCardProps {
@@ -22,6 +23,7 @@ export const LiteratureCard: React.FC<LiteratureCardProps> = ({
   const toggleLikeMutation = useToggleLike();
   const { toggleSaveOffline, isSavedOffline } = useReaderStore();
   const { uiLang } = useLanguageStore();
+  const { showToast } = useToastStore();
   const saved = isSavedOffline(item.id);
 
   const isBengali = item.language === 'bn';
@@ -35,11 +37,21 @@ export const LiteratureCard: React.FC<LiteratureCardProps> = ({
   const handleLike = (e: React.MouseEvent) => {
     e.stopPropagation();
     toggleLikeMutation.mutate(item.id);
+    showToast(
+      item.is_liked
+        ? (uiLang === 'bn' ? 'লাইক সরানো হয়েছে' : 'Unliked')
+        : (uiLang === 'bn' ? 'লাইক দেওয়া হয়েছে ❤️' : 'Liked ❤️')
+    );
   };
 
   const handleSave = (e: React.MouseEvent) => {
     e.stopPropagation();
     toggleSaveOffline(item);
+    showToast(
+      saved
+        ? (uiLang === 'bn' ? 'অফলাইন থেকে সরান হয়েছে' : 'Removed from offline')
+        : (uiLang === 'bn' ? 'অফলাইনে সংরক্ষিত হয়েছে 🔖' : 'Saved for offline reading 🔖')
+    );
   };
 
   const handleCommentClick = (e: React.MouseEvent) => {
@@ -57,14 +69,14 @@ export const LiteratureCard: React.FC<LiteratureCardProps> = ({
       }).catch(() => {});
     } else {
       navigator.clipboard.writeText(window.location.href);
-      alert(uiLang === 'bn' ? 'লিঙ্ক কপি করা হয়েছে!' : 'Link copied to clipboard!');
+      showToast(uiLang === 'bn' ? 'লিঙ্ক কপি করা হয়েছে! 🔗' : 'Link copied to clipboard! 🔗');
     }
   };
 
   return (
     <article
       onClick={() => onRead(item)}
-      className="p-5 rounded-2xl border border-theme-main bg-theme-card shadow-sm hover:shadow-md transition-all cursor-pointer space-y-3.5 group"
+      className="p-5 rounded-2xl border border-theme-main bg-theme-card shadow-sm hover:shadow-md transition-all cursor-pointer space-y-3.5 group relative overflow-hidden"
     >
       {/* Author Header & Category */}
       <div className="flex items-center justify-between gap-2">
@@ -75,7 +87,7 @@ export const LiteratureCard: React.FC<LiteratureCardProps> = ({
           }}
           className="flex items-center space-x-2.5 hover:opacity-80 transition-opacity cursor-pointer"
         >
-          <div className="w-9 h-9 rounded-full bg-emerald-500/20 text-emerald-500 font-bold flex items-center justify-center text-sm border border-emerald-500/30 overflow-hidden">
+          <div className="w-9 h-9 rounded-full bg-emerald-500/20 text-emerald-500 font-bold flex items-center justify-center text-sm border border-emerald-500/30 overflow-hidden shrink-0">
             {item.author?.avatarUrl ? (
               <img src={item.author.avatarUrl} alt={item.author.name} className="w-full h-full object-cover" />
             ) : (

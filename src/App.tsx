@@ -4,6 +4,7 @@ import { BottomNav } from './components/BottomNav';
 import { CommentModal } from './components/CommentModal';
 import { CreateLiteratureModal } from './components/CreateLiteratureModal';
 import { AuthModal } from './components/AuthModal';
+import { ToastContainer } from './components/Toast';
 
 import { HomePage } from './pages/HomePage';
 import { ReadingPage } from './pages/ReadingPage';
@@ -180,6 +181,8 @@ export default function App() {
         isOpen={isAuthOpen}
         onClose={() => setIsAuthOpen(false)}
       />
+
+      <ToastContainer />
     </div>
   );
 }
