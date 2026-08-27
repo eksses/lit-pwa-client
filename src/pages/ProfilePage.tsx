@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { User as UserIcon, LogOut, PlusCircle, Feather, Users, BookOpen, UserPlus, UserCheck, PenTool, Sparkles } from 'lucide-react';
+import { User as UserIcon, LogOut, PlusCircle, Feather, Users, BookOpen, UserPlus, UserCheck, Trash2, Sparkles } from 'lucide-react';
 import { Literature } from '../types';
 import { useAuthStore } from '../store/useAuthStore';
 import { useLanguageStore } from '../store/useLanguageStore';
+import { useToastStore } from '../store/useToastStore';
 import { t } from '../utils/translations';
-import { useAuthorProfile, useToggleFollow } from '../hooks/useAuthors';
+import { useAuthorProfile, useToggleFollow, useDeleteUser } from '../hooks/useAuthors';
 import { useLiteratureList } from '../hooks/useLiterature';
 import { LiteratureCard } from '../components/LiteratureCard';
+import { ConfirmModal } from '../components/ConfirmModal';
 import api from '../utils/api';
 
 interface ProfilePageProps {
@@ -26,12 +28,16 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
 }) => {
   const { user: currentUser, isAuthenticated, logout, setUser } = useAuthStore();
   const { uiLang } = useLanguageStore();
+  const { showToast } = useToastStore();
   const toggleFollowMutation = useToggleFollow();
+  const deleteUserMutation = useDeleteUser();
 
   const [isUpgrading, setIsUpgrading] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const targetAuthorId = authorId || currentUser?.id;
   const isSelf = Boolean(currentUser && currentUser.id === targetAuthorId);
+  const isAdmin = currentUser?.role === 'admin';
 
   const { data: authorProfile, isLoading: isProfileLoading } = useAuthorProfile(targetAuthorId || '');
   const { data: authorWorks, isLoading: isWorksLoading } = useLiteratureList({
@@ -50,6 +56,20 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
     } finally {
       setIsUpgrading(false);
     }
+  };
+
+  const handleDeleteAccount = () => {
+    if (!targetAuthorId) return;
+    deleteUserMutation.mutate(targetAuthorId, {
+      onSuccess: () => {
+        showToast(
+          uiLang === 'bn'
+            ? 'লেখক অ্যাকাউন্ট ও তার সকল উপাদান সফলভাবে মুছে ফেলা হয়েছে'
+            : 'Author account and all works deleted'
+        );
+        setShowDeleteConfirm(false);
+      },
+    });
   };
 
   // If unauthenticated and not viewing specific author
@@ -127,39 +147,53 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                 <p className="text-xs opacity-60 font-enUI">@{profile?.username}</p>
               </div>
 
-              {isSelf ? (
-                <button
-                  onClick={logout}
-                  className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full border border-rose-500/30 text-rose-500 text-xs font-medium font-bnUI hover:bg-rose-500/10 transition-colors self-center sm:self-auto"
-                >
-                  <LogOut className="w-3.5 h-3.5" />
-                  <span>{t('logout', uiLang)}</span>
-                </button>
-              ) : (
-                profile && (
+              <div className="flex items-center space-x-2 justify-center sm:justify-start">
+                {isSelf ? (
                   <button
-                    onClick={() => profile?.id && toggleFollowMutation.mutate(profile.id)}
-                    disabled={toggleFollowMutation.isPending}
-                    className={`inline-flex items-center space-x-1.5 px-4 py-1.5 rounded-full text-xs font-semibold font-bnUI transition-all shadow-sm ${
-                      profile.is_following
-                        ? 'bg-gray-500/10 text-emerald-500 border border-emerald-500/30'
-                        : 'bg-emerald-500 text-white hover:bg-emerald-600'
-                    }`}
+                    onClick={logout}
+                    className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full border border-rose-500/30 text-rose-500 text-xs font-medium font-bnUI hover:bg-rose-500/10 transition-colors"
                   >
-                    {profile.is_following ? (
-                      <>
-                        <UserCheck className="w-3.5 h-3.5" />
-                        <span>{t('following', uiLang)}</span>
-                      </>
-                    ) : (
-                      <>
-                        <UserPlus className="w-3.5 h-3.5" />
-                        <span>{t('follow', uiLang)}</span>
-                      </>
-                    )}
+                    <LogOut className="w-3.5 h-3.5" />
+                    <span>{t('logout', uiLang)}</span>
                   </button>
-                )
-              )}
+                ) : (
+                  profile && (
+                    <button
+                      onClick={() => profile?.id && toggleFollowMutation.mutate(profile.id)}
+                      disabled={toggleFollowMutation.isPending}
+                      className={`inline-flex items-center space-x-1.5 px-4 py-1.5 rounded-full text-xs font-semibold font-bnUI transition-all shadow-sm ${
+                        profile.is_following
+                          ? 'bg-gray-500/10 text-emerald-500 border border-emerald-500/30'
+                          : 'bg-emerald-500 text-white hover:bg-emerald-600'
+                      }`}
+                    >
+                      {profile.is_following ? (
+                        <>
+                          <UserCheck className="w-3.5 h-3.5" />
+                          <span>{t('following', uiLang)}</span>
+                        </>
+                      ) : (
+                        <>
+                          <UserPlus className="w-3.5 h-3.5" />
+                          <span>{t('follow', uiLang)}</span>
+                        </>
+                      )}
+                    </button>
+                  )
+                )}
+
+                {/* Admin Delete User Account Option */}
+                {isAdmin && !isSelf && (
+                  <button
+                    onClick={() => setShowDeleteConfirm(true)}
+                    className="inline-flex items-center space-x-1 px-3 py-1.5 rounded-full bg-rose-500/15 text-rose-500 border border-rose-500/30 text-xs font-semibold font-bnUI hover:bg-rose-500/25 transition-colors"
+                    title={uiLang === 'bn' ? 'অ্যাকাউন্ট মুছুন (Admin)' : 'Delete Account (Admin)'}
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>{uiLang === 'bn' ? 'অ্যাকাউন্ট মুছুন' : 'Delete Account'}</span>
+                  </button>
+                )}
+              </div>
             </div>
 
             <p className="text-xs opacity-80 font-bnUI leading-relaxed pt-1">
@@ -259,6 +293,20 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
           </div>
         )}
       </div>
+
+      {/* Sleek Custom Confirm Modal for User Account Deletion */}
+      <ConfirmModal
+        isOpen={showDeleteConfirm}
+        title={uiLang === 'bn' ? 'অ্যাকাউন্ট মুছে ফেলা' : 'Delete User Account'}
+        message={
+          uiLang === 'bn'
+            ? `আপনি কি নিশ্চিত যে '${profile?.name}'-এর অ্যাকাউন্ট এবং তার সকল প্রকাশিত সাহিত্য স্থায়ীভাবে মুছে ফেলতে চান?`
+            : `Are you sure you want to permanently delete '${profile?.name}' and all their published works?`
+        }
+        confirmText={uiLang === 'bn' ? 'অ্যাকাউন্ট মুছুন' : 'Delete Account'}
+        onConfirm={handleDeleteAccount}
+        onClose={() => setShowDeleteConfirm(false)}
+      />
     </div>
   );
 };

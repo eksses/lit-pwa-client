@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
-import { BookOpen, Scroll, Feather, Sparkles, Search, User as UserIcon, Users, ArrowRight } from 'lucide-react';
+import { BookOpen, Scroll, Feather, Sparkles, Search, User as UserIcon, Users, ArrowRight, Trash2 } from 'lucide-react';
 import { Category, Literature } from '../types';
 import { useLiteratureList } from '../hooks/useLiterature';
-import { useAuthorsList } from '../hooks/useAuthors';
+import { useAuthorsList, useDeleteUser } from '../hooks/useAuthors';
+import { useAuthStore } from '../store/useAuthStore';
 import { useLanguageStore } from '../store/useLanguageStore';
+import { useToastStore } from '../store/useToastStore';
 import { t } from '../utils/translations';
 import { LiteratureCard } from '../components/LiteratureCard';
+import { ConfirmModal } from '../components/ConfirmModal';
 
 interface CategoriesPageProps {
   onRead: (item: Literature) => void;
@@ -20,8 +23,14 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({
 }) => {
   const [selectedCat, setSelectedCat] = useState<'all' | Category | 'authors'>('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const { uiLang } = useLanguageStore();
+  const [deletingUser, setDeletingUser] = useState<{ id: string; name: string } | null>(null);
 
+  const { user } = useAuthStore();
+  const { uiLang } = useLanguageStore();
+  const { showToast } = useToastStore();
+  const deleteUserMutation = useDeleteUser();
+
+  const isAdmin = user?.role === 'admin';
   const isAuthorsTab = selectedCat === 'authors';
 
   // Fetch literature items for selected category
@@ -56,6 +65,20 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({
       item.author?.username?.toLowerCase().includes(q)
     );
   });
+
+  const handleDeleteUserConfirm = () => {
+    if (!deletingUser) return;
+    deleteUserMutation.mutate(deletingUser.id, {
+      onSuccess: () => {
+        showToast(
+          uiLang === 'bn'
+            ? `${deletingUser.name}-এর অ্যাকাউন্ট এবং তার সকল পোস্ট মুছে ফেলা হয়েছে`
+            : `${deletingUser.name}'s account and all works deleted`
+        );
+        setDeletingUser(null);
+      },
+    });
+  };
 
   return (
     <div className="space-y-5 pb-20 max-w-xl mx-auto pt-2">
@@ -143,7 +166,7 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({
                 <div
                   key={author.id}
                   onClick={() => onAuthorClick(author.id)}
-                  className="p-4 rounded-3xl border border-theme-main/60 bg-theme-card hover:border-emerald-500/50 transition-all cursor-pointer space-y-2.5 group"
+                  className="p-4 rounded-3xl border border-theme-main/60 bg-theme-card hover:border-emerald-500/50 transition-all cursor-pointer space-y-2.5 group relative"
                 >
                   <div className="flex items-center space-x-3">
                     <div className="w-11 h-11 rounded-full bg-emerald-500/15 text-emerald-500 font-bold flex items-center justify-center text-sm border border-emerald-500/20 overflow-hidden shrink-0">
@@ -154,9 +177,23 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="text-sm font-bold truncate group-hover:text-emerald-500 transition-colors font-bnUI">
-                        {author.name}
-                      </h4>
+                      <div className="flex items-center justify-between">
+                        <h4 className="text-sm font-bold truncate group-hover:text-emerald-500 transition-colors font-bnUI">
+                          {author.name}
+                        </h4>
+                        {isAdmin && author.id !== user?.id && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setDeletingUser({ id: author.id, name: author.name });
+                            }}
+                            className="p-1 rounded-full text-rose-400 hover:text-rose-500 hover:bg-rose-500/10 transition-colors"
+                            title={uiLang === 'bn' ? 'অ্যাকাউন্ট মুছুন (Admin)' : 'Delete User (Admin)'}
+                          >
+                            <Trash2 className="w-4 h-4 text-rose-400" />
+                          </button>
+                        )}
+                      </div>
                       <p className="text-xs opacity-60 font-enUI truncate">@{author.username}</p>
                     </div>
                   </div>
@@ -192,6 +229,14 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({
                   ? t('poems', uiLang)
                   : selectedCat === 'story'
                   ? t('stories', uiLang)
+                  : selectedCat === 'serial_story'
+                  ? t('serialStory', uiLang)
+                  : selectedCat === 'novel'
+                  ? t('novel', uiLang)
+                  : selectedCat === 'long_story'
+                  ? t('longStory', uiLang)
+                  : selectedCat === 'collection'
+                  ? t('collection', uiLang)
                   : t('microPoetry', uiLang)}
               </span>
             </h3>
@@ -229,6 +274,20 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({
           )}
         </div>
       )}
+
+      {/* Sleek Custom Confirm Modal for User Account Deletion */}
+      <ConfirmModal
+        isOpen={Boolean(deletingUser)}
+        title={uiLang === 'bn' ? 'অ্যাকাউন্ট মুছে ফেলা' : 'Delete User Account'}
+        message={
+          uiLang === 'bn'
+            ? `আপনি কি নিশ্চিত যে '${deletingUser?.name}'-এর অ্যাকাউন্ট এবং তার সকল প্রকাশিত কবিতা ও গল্প চূড়ান্তভাবে মুছে ফেলতে চান?`
+            : `Are you sure you want to permanently delete '${deletingUser?.name}' and all associated works?`
+        }
+        confirmText={uiLang === 'bn' ? 'অ্যাকাউন্ট মুছুন' : 'Delete Account'}
+        onConfirm={handleDeleteUserConfirm}
+        onClose={() => setDeletingUser(null)}
+      />
     </div>
   );
 };

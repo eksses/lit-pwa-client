@@ -65,3 +65,19 @@ export function useToggleFollow() {
     },
   });
 }
+
+export function useDeleteUser() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (userId: string) => {
+      const response = await api.delete<{ success: boolean; message: string }>(`/authors/${userId}`);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['authors'] });
+      queryClient.invalidateQueries({ queryKey: ['literature'] });
+      queryClient.invalidateQueries({ queryKey: ['feed'] });
+    },
+  });
+}
