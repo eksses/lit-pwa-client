@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { X, Send, MessageSquare, User as UserIcon } from 'lucide-react';
+import { X, Send, MessageSquare, User as UserIcon, Trash2 } from 'lucide-react';
 import { Literature } from '../types';
 import { useAuthStore } from '../store/useAuthStore';
 import { useLanguageStore } from '../store/useLanguageStore';
 import { t } from '../utils/translations';
-import { useAddComment } from '../hooks/useLiterature';
+import { useAddComment, useDeleteComment } from '../hooks/useLiterature';
 
 interface CommentModalProps {
   isOpen: boolean;
@@ -16,6 +16,7 @@ export const CommentModal: React.FC<CommentModalProps> = ({ isOpen, onClose, lit
   const { user, isAuthenticated } = useAuthStore();
   const { uiLang } = useLanguageStore();
   const addCommentMutation = useAddComment();
+  const deleteCommentMutation = useDeleteComment();
 
   const [content, setContent] = useState('');
   const [guestName, setGuestName] = useState(() => {
@@ -50,6 +51,7 @@ export const CommentModal: React.FC<CommentModalProps> = ({ isOpen, onClose, lit
 
   const isBengali = literature.language === 'bn';
   const commentsList = literature.comments || [];
+  const postAuthorId = literature.authorId || literature.author?.id;
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/75 backdrop-blur-sm p-0 sm:p-4 animate-in fade-in duration-200">
@@ -91,8 +93,12 @@ export const CommentModal: React.FC<CommentModalProps> = ({ isOpen, onClose, lit
           ) : (
             commentsList.map((comment) => {
               const commentatorName = comment.user?.name || comment.guestName || t('guestBadge', uiLang);
+              const canDeleteComment =
+                user?.role === 'admin' ||
+                (user?.id && (user.id === postAuthorId || (comment.user && user.id === comment.user.id)));
+
               return (
-                <div key={comment.id} className="pt-3 first:pt-0 space-y-1">
+                <div key={comment.id} className="pt-3 first:pt-0 space-y-1 group">
                   <div className="flex items-center justify-between text-xs">
                     <div className="flex items-center space-x-1.5 font-semibold text-emerald-500">
                       <UserIcon className="w-3.5 h-3.5" />
@@ -103,9 +109,22 @@ export const CommentModal: React.FC<CommentModalProps> = ({ isOpen, onClose, lit
                         </span>
                       )}
                     </div>
-                    <span className="text-[10px] opacity-60 font-enUI">
-                      {new Date(comment.createdAt).toLocaleDateString()}
-                    </span>
+                    <div className="flex items-center space-x-2 text-[10px] opacity-60">
+                      <span className="font-enUI">{new Date(comment.createdAt).toLocaleDateString()}</span>
+                      {canDeleteComment && (
+                        <button
+                          onClick={() => {
+                            if (confirm(uiLang === 'bn' ? 'মন্তব্যটি মুছে ফেলতে চান?' : 'Delete this comment?')) {
+                              deleteCommentMutation.mutate(comment.id);
+                            }
+                          }}
+                          className="text-rose-400 hover:text-rose-500 transition-colors p-0.5"
+                          title={uiLang === 'bn' ? 'মন্তব্য মুছুন' : 'Delete Comment'}
+                        >
+                          <Trash2 className="w-3.5 h-3.5 text-rose-400" />
+                        </button>
+                      )}
+                    </div>
                   </div>
                   <p className={`text-sm opacity-90 leading-relaxed ${isBengali ? 'font-bnUI' : 'font-enUI'}`}>
                     {comment.content}

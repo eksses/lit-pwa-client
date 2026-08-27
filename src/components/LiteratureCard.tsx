@@ -1,7 +1,8 @@
 import React from 'react';
-import { Heart, MessageSquare, Clock, Bookmark, Share2 } from 'lucide-react';
+import { Heart, MessageSquare, Clock, Bookmark, Share2, Trash2 } from 'lucide-react';
 import { Literature } from '../types';
-import { useToggleLike } from '../hooks/useLiterature';
+import { useToggleLike, useDeleteLiterature } from '../hooks/useLiterature';
+import { useAuthStore } from '../store/useAuthStore';
 import { useReaderStore } from '../store/useReaderStore';
 import { useLanguageStore } from '../store/useLanguageStore';
 import { useToastStore } from '../store/useToastStore';
@@ -20,12 +21,16 @@ export const LiteratureCard: React.FC<LiteratureCardProps> = ({
   onComment,
   onAuthorClick,
 }) => {
+  const { user } = useAuthStore();
   const toggleLikeMutation = useToggleLike();
+  const deleteLiteratureMutation = useDeleteLiterature();
   const { toggleSaveOffline, isSavedOffline, hasRead } = useReaderStore();
   const { uiLang } = useLanguageStore();
   const { showToast } = useToastStore();
   const saved = isSavedOffline(item.id);
   const isRead = hasRead(item.id);
+
+  const canDelete = user?.role === 'admin' || (user?.id && (user.id === item.authorId || user.id === item.author?.id));
 
   const isBengali = item.language === 'bn';
 
@@ -197,6 +202,23 @@ export const LiteratureCard: React.FC<LiteratureCardProps> = ({
           >
             <Share2 className="w-3.5 h-3.5" />
           </button>
+
+          {/* Delete Work (Admin or Post Author) */}
+          {canDelete && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                if (confirm(uiLang === 'bn' ? 'আপনি কি নিশ্চিত যে এই লেখাটি মুছে ফেলতে চান?' : 'Are you sure you want to delete this work?')) {
+                  deleteLiteratureMutation.mutate(item.id);
+                  showToast(uiLang === 'bn' ? 'লেখাটি মুছে ফেলা হয়েছে' : 'Literature deleted');
+                }
+              }}
+              className="p-1.5 rounded-full text-rose-400 hover:text-rose-500 hover:bg-rose-500/10 transition-colors"
+              title={uiLang === 'bn' ? 'মুছে ফেলুন' : 'Delete'}
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
       </div>
     </article>

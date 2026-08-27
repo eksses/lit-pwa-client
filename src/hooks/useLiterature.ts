@@ -205,3 +205,32 @@ export function useFeed(params?: { page?: number; limit?: number }) {
     },
   });
 }
+
+export function useDeleteLiterature() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const response = await api.delete<{ success: boolean; message: string }>(`/literature/${id}`);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['literature'] });
+      queryClient.invalidateQueries({ queryKey: ['feed'] });
+    },
+  });
+}
+
+export function useDeleteComment() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (commentId: string) => {
+      const response = await api.delete<{ success: boolean; message: string }>(`/literature/comments/${commentId}`);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['literature'] });
+    },
+  });
+}
