@@ -19,7 +19,8 @@
     color-scheme: light;
   }
 
-  html.theme-dark {
+  html.theme-dark,
+  html.dark {
     --bg-main: #121212;
     --text-main: #e5e7eb;
     --bg-card: #1e1e1e;
@@ -38,9 +39,10 @@
   input,
   textarea,
   select,
-  option {
+  option,
+  article,
+  section {
     color: var(--text-main);
-    background-color: var(--bg-card);
   }
 }
 
@@ -63,7 +65,9 @@
 
 /* Placeholder contrast styling per theme */
 html.theme-dark ::placeholder,
-html.theme-dark ::-webkit-input-placeholder {
+html.dark ::placeholder,
+html.theme-dark ::-webkit-input-placeholder,
+html.dark ::-webkit-input-placeholder {
   color: #9ca3af !important;
   opacity: 0.7;
 }
@@ -98,10 +102,11 @@ html.theme-light ::-webkit-input-placeholder {
 
 /* Dark Mode Input Autofill fix */
 html.theme-dark input:-webkit-autofill,
-html.theme-dark input:-webkit-autofill:hover,
-html.theme-dark input:-webkit-autofill:focus,
+html.dark input:-webkit-autofill,
 html.theme-dark textarea:-webkit-autofill,
-html.theme-dark select:-webkit-autofill {
+html.dark textarea:-webkit-autofill,
+html.theme-dark select:-webkit-autofill,
+html.dark select:-webkit-autofill {
   -webkit-text-fill-color: #e5e7eb !important;
   -webkit-box-shadow: 0 0 0px 1000px #1e1e1e inset !important;
   transition: background-color 5000s ease-in-out 0s;

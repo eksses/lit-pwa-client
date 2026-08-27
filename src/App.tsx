@@ -42,7 +42,7 @@ export default function App() {
 
   // Synchronize document theme class
   useEffect(() => {
-    document.documentElement.className = `theme-${theme}`;
+    document.documentElement.className = `theme-${theme} ${theme === 'dark' ? 'dark' : ''}`;
   }, [theme]);
 
   const handleReadLiterature = (item: Literature) => {
