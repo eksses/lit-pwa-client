@@ -1,6 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
-  <rect width="100" height="100" rx="20" fill="#121212"/>
-  <path d="M30 70C30 50 45 35 70 30C65 50 50 65 30 70Z" fill="#10B981"/>
-  <path d="M35 75C50 75 70 60 75 35" stroke="#F59E0B" stroke-width="4" stroke-linecap="round"/>
-  <circle cx="65" cy="35" r="4" fill="#F59E0B"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <rect width="512" height="512" rx="128" fill="#121212"/>
+  <!-- Book Spine & Pages -->
+  <path d="M180 360 C 240 330, 320 340, 390 370 L 390 230 C 320 200, 240 210, 180 240 Z" fill="#10b981" opacity="0.25" />
+  <path d="M180 360 C 240 330, 320 340, 390 370 L 390 230 C 320 200, 240 210, 180 240 Z" stroke="#10b981" stroke-width="28" stroke-linecap="round" stroke-linejoin="round" />
+  <!-- Feather Quill Overlay -->
+  <path d="M340 120 C 250 140, 160 210, 140 370 C 140 370, 190 340, 250 310 C 310 280, 350 200, 340 120 Z" fill="#10b981" />
+  <path d="M140 370 L 120 410 L 160 385" stroke="#10b981" stroke-width="24" stroke-linecap="round" stroke-linejoin="round" />
 </svg>

@@ -2,7 +2,7 @@ import { Language } from '../types';
 
 export const translations = {
   // App Branding
-  appName: { bn: 'কাব্য ও কথা', en: 'Kavya & Katha' },
+  appName: { bn: 'নির্বাক', en: 'Nirbak' },
   tagline: { bn: 'বাংলা ও ইংরেজি সাহিত্য নিকেতন', en: 'Sanctuary for Bangla & English Literature' },
 
   // Navigation

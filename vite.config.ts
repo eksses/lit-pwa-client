@@ -11,8 +11,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png'],
       manifest: {
-        name: 'কবিতানল | Literature PWA',
-        short_name: 'কবিতানল',
+        name: 'নির্বাক (Nirbak) | Mobile Literature PWA',
+        short_name: 'Nirbak',
         description: 'Read, like, and comment on Bangla & English literature online and offline.',
         theme_color: '#121212',
         background_color: '#121212',
