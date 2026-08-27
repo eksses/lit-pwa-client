@@ -63,6 +63,20 @@
   border-color: var(--border-main);
 }
 
+/* iOS & Android Safe Area Utilities for Notch / Dynamic Island / Gesture Navigation */
+.pt-safe {
+  padding-top: max(0.5rem, env(safe-area-inset-top));
+}
+
+.pb-safe {
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+}
+
+.px-safe {
+  padding-left: max(0.75rem, env(safe-area-inset-left));
+  padding-right: max(0.75rem, env(safe-area-inset-right));
+}
+
 /* Placeholder contrast styling per theme */
 html.theme-dark ::placeholder,
 html.dark ::placeholder,

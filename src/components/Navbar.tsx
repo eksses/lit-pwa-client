@@ -29,9 +29,9 @@ export const Navbar: React.FC<NavbarProps> = ({
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
       if (currentScrollY > 60 && currentScrollY > lastScrollY) {
-        setIsVisible(false); // Scroll down -> hide header (Instagram/FB mobile style)
+        setIsVisible(false);
       } else {
-        setIsVisible(true); // Scroll up -> reveal header instantly
+        setIsVisible(true);
       }
       setLastScrollY(currentScrollY);
     };
@@ -42,11 +42,11 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <header
-      className={`sticky top-0 z-40 backdrop-blur-md bg-theme-main/90 border-b border-theme-main/50 transition-transform duration-300 ${
+      className={`sticky top-0 z-40 backdrop-blur-md bg-theme-main/90 border-b border-theme-main/50 transition-transform duration-300 pt-safe px-safe ${
         isVisible ? 'translate-y-0' : '-translate-y-full'
       }`}
     >
-      <div className="max-w-xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div className="max-w-xl mx-auto px-4 py-2.5 flex items-center justify-between">
         {/* Minimal Brand Logo */}
         <button
           onClick={() => onNavigateTab('home')}

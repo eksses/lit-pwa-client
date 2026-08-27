@@ -17,9 +17,9 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onTabChange }) 
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
       if (currentScrollY > 60 && currentScrollY > lastScrollY) {
-        setIsVisible(false); // Scroll down -> hide bottom bar (Instagram/FB mobile style)
+        setIsVisible(false);
       } else {
-        setIsVisible(true); // Scroll up -> reveal bottom bar instantly
+        setIsVisible(true);
       }
       setLastScrollY(currentScrollY);
     };
@@ -38,7 +38,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onTabChange }) 
 
   return (
     <nav
-      className={`fixed bottom-0 left-0 right-0 z-40 bg-theme-main/95 backdrop-blur-md border-t border-theme-main/60 pb-safe transition-transform duration-300 shadow-lg ${
+      className={`fixed bottom-0 left-0 right-0 z-40 bg-theme-main/95 backdrop-blur-md border-t border-theme-main/60 pb-safe px-safe transition-transform duration-300 shadow-lg ${
         isVisible ? 'translate-y-0' : 'translate-y-full'
       }`}
     >
