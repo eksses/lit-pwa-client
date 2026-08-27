@@ -2,6 +2,8 @@ import React from 'react';
 import { Type, Sun, Coffee, Moon, Minus, Plus } from 'lucide-react';
 import { Theme } from '../types';
 import { useReaderStore } from '../store/useReaderStore';
+import { useLanguageStore } from '../store/useLanguageStore';
+import { t } from '../utils/translations';
 
 interface ReadingControlsProps {
   onThemeChange?: (theme: Theme) => void;
@@ -9,6 +11,7 @@ interface ReadingControlsProps {
 
 export const ReadingControls: React.FC<ReadingControlsProps> = ({ onThemeChange }) => {
   const { theme, setTheme, fontSize, setFontSize } = useReaderStore();
+  const { uiLang } = useLanguageStore();
 
   const handleThemeChange = (newTheme: Theme) => {
     setTheme(newTheme);
@@ -32,11 +35,11 @@ export const ReadingControls: React.FC<ReadingControlsProps> = ({ onThemeChange 
   return (
     <div className="p-4 rounded-2xl border border-theme-main bg-theme-card shadow-lg space-y-4 max-w-sm mx-auto transition-colors">
       <div className="flex items-center justify-between">
-        <h4 className="text-xs font-semibold text-gray-500 font-bnUI flex items-center space-x-1">
+        <h4 className="text-xs font-semibold opacity-75 font-bnUI flex items-center space-x-1">
           <Type className="w-3.5 h-3.5 text-emerald-500" />
-          <span>পাঠক সেটিংস (Reader Customization)</span>
+          <span>{t('readerSettings', uiLang)}</span>
         </h4>
-        <span className="text-xs font-mono font-medium text-emerald-600 font-bnUI">
+        <span className="text-xs font-mono font-medium text-emerald-500 font-bnUI">
           {fontSize}px
         </span>
       </div>
@@ -47,10 +50,10 @@ export const ReadingControls: React.FC<ReadingControlsProps> = ({ onThemeChange 
           onClick={handleDecreaseFont}
           disabled={fontSize <= 13}
           className="p-2 rounded-xl bg-gray-500/10 hover:bg-gray-500/20 disabled:opacity-30 transition-all text-xs font-bold font-bnUI flex items-center space-x-1"
-          title="ফন্ট সাইজ ছোট করুন"
+          title={uiLang === 'bn' ? 'ফন্ট সাইজ ছোট করুন' : 'Decrease font size'}
         >
           <Minus className="w-3.5 h-3.5" />
-          <span>ছোট</span>
+          <span>A-</span>
         </button>
 
         <input
@@ -66,10 +69,10 @@ export const ReadingControls: React.FC<ReadingControlsProps> = ({ onThemeChange 
           onClick={handleIncreaseFont}
           disabled={fontSize >= 28}
           className="p-2 rounded-xl bg-gray-500/10 hover:bg-gray-500/20 disabled:opacity-30 transition-all text-xs font-bold font-bnUI flex items-center space-x-1"
-          title="ফন্ট সাইজ বড় করুন"
+          title={uiLang === 'bn' ? 'ফন্ট সাইজ বড় করুন' : 'Increase font size'}
         >
           <Plus className="w-3.5 h-3.5" />
-          <span>বড়</span>
+          <span>A+</span>
         </button>
       </div>
 
@@ -80,11 +83,11 @@ export const ReadingControls: React.FC<ReadingControlsProps> = ({ onThemeChange 
           className={`p-2.5 rounded-xl text-xs font-semibold border flex flex-col items-center justify-center space-y-1 transition-all ${
             theme === 'light'
               ? 'border-emerald-500 bg-white text-gray-900 shadow-md ring-2 ring-emerald-500/20'
-              : 'border-gray-200 bg-white/60 text-gray-700 hover:border-gray-300'
+              : 'border-theme-main bg-theme-main/50 opacity-70 hover:opacity-100'
           }`}
         >
           <Sun className="w-4 h-4 text-amber-500" />
-          <span className="font-bnUI">লাইট</span>
+          <span className="font-bnUI">{t('themeLight', uiLang)}</span>
         </button>
 
         <button
@@ -92,23 +95,23 @@ export const ReadingControls: React.FC<ReadingControlsProps> = ({ onThemeChange 
           className={`p-2.5 rounded-xl text-xs font-semibold border flex flex-col items-center justify-center space-y-1 transition-all ${
             theme === 'sepia'
               ? 'border-amber-700 bg-[#f4e7ca] text-[#2d2318] shadow-md ring-2 ring-amber-700/20'
-              : 'border-[#e4d3ab] bg-[#fbf0d9]/80 text-[#5c4314] hover:border-amber-600'
+              : 'border-theme-main bg-theme-main/50 opacity-70 hover:opacity-100'
           }`}
         >
           <Coffee className="w-4 h-4 text-amber-700" />
-          <span className="font-bnUI">সেপিয়া</span>
+          <span className="font-bnUI">{t('themeSepia', uiLang)}</span>
         </button>
 
         <button
           onClick={() => handleThemeChange('dark')}
           className={`p-2.5 rounded-xl text-xs font-semibold border flex flex-col items-center justify-center space-y-1 transition-all ${
             theme === 'dark'
-              ? 'border-emerald-500 bg-[#1e1e1e] text-white shadow-md ring-2 ring-emerald-500/20'
-              : 'border-gray-800 bg-[#121212]/80 text-gray-300 hover:border-gray-700'
+              ? 'border-emerald-500 bg-emerald-500/20 text-emerald-400 shadow-md ring-2 ring-emerald-500/20'
+              : 'border-theme-main bg-theme-main/50 opacity-70 hover:opacity-100'
           }`}
         >
           <Moon className="w-4 h-4 text-emerald-400" />
-          <span className="font-bnUI">ডার্ক</span>
+          <span className="font-bnUI">{t('themeDark', uiLang)}</span>
         </button>
       </div>
     </div>

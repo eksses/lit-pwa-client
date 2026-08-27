@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { ArrowLeft, Sliders, Heart, MessageSquare, Bookmark, Share2, UserPlus, UserCheck, Eye, Clock } from 'lucide-react';
 import { Literature } from '../types';
 import { useReaderStore } from '../store/useReaderStore';
+import { useLanguageStore } from '../store/useLanguageStore';
+import { t } from '../utils/translations';
 import { useToggleLike } from '../hooks/useLiterature';
 import { useToggleFollow, useAuthorProfile } from '../hooks/useAuthors';
 import { ReadingControls } from '../components/ReadingControls';
@@ -20,6 +22,7 @@ export const ReadingPage: React.FC<ReadingPageProps> = ({
   onAuthorClick,
 }) => {
   const { fontSize, toggleSaveOffline, isSavedOffline } = useReaderStore();
+  const { uiLang } = useLanguageStore();
   const [showControls, setShowControls] = useState(false);
 
   const toggleLikeMutation = useToggleLike();
@@ -51,7 +54,7 @@ export const ReadingPage: React.FC<ReadingPageProps> = ({
       }).catch(() => {});
     } else {
       navigator.clipboard.writeText(window.location.href);
-      alert('লিঙ্ক কপি করা হয়েছে!');
+      alert(uiLang === 'bn' ? 'লিঙ্ক কপি করা হয়েছে!' : 'Link copied to clipboard!');
     }
   };
 
@@ -61,11 +64,11 @@ export const ReadingPage: React.FC<ReadingPageProps> = ({
       <header className="sticky top-0 z-30 bg-theme-main/90 backdrop-blur-md border-b border-theme-main px-4 py-3 flex items-center justify-between">
         <button
           onClick={onBack}
-          className="flex items-center space-x-1 p-1.5 rounded-full hover:bg-gray-500/10 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
-          title="ফিরে যান"
+          className="flex items-center space-x-1 p-1.5 rounded-full hover:bg-gray-500/10 transition-colors"
+          title={uiLang === 'bn' ? 'ফিরে যান' : 'Back'}
         >
           <ArrowLeft className="w-5 h-5" />
-          <span className="text-xs font-bnUI">ফিরে যান</span>
+          <span className="text-xs font-bnUI">{uiLang === 'bn' ? 'ফিরে যান' : 'Back'}</span>
         </button>
 
         <div className="flex items-center space-x-2">
@@ -73,9 +76,9 @@ export const ReadingPage: React.FC<ReadingPageProps> = ({
           <button
             onClick={() => toggleSaveOffline(literature)}
             className={`p-2 rounded-full transition-colors ${
-              saved ? 'text-emerald-500 bg-emerald-500/10' : 'text-gray-400 hover:text-gray-600'
+              saved ? 'text-emerald-500 bg-emerald-500/10' : 'opacity-70 hover:opacity-100'
             }`}
-            title={saved ? 'অফলাইন থেকে সরান' : 'অফলাইনে সংরক্ষণ করুন'}
+            title={saved ? t('savedOffline', uiLang) : t('saveOffline', uiLang)}
           >
             <Bookmark className={`w-5 h-5 ${saved ? 'fill-emerald-500' : ''}`} />
           </button>
@@ -84,9 +87,9 @@ export const ReadingPage: React.FC<ReadingPageProps> = ({
           <button
             onClick={() => setShowControls(!showControls)}
             className={`p-2 rounded-full transition-colors ${
-              showControls ? 'bg-emerald-500 text-white' : 'bg-gray-500/10 text-gray-500 hover:text-gray-800'
+              showControls ? 'bg-emerald-500 text-white' : 'bg-gray-500/10 opacity-70 hover:opacity-100'
             }`}
-            title="ফন্ট ও থিম সেটিংস"
+            title={t('readerSettings', uiLang)}
           >
             <Sliders className="w-5 h-5" />
           </button>
@@ -108,7 +111,7 @@ export const ReadingPage: React.FC<ReadingPageProps> = ({
             onClick={() => onAuthorClick && authorId && onAuthorClick(authorId)}
             className="flex items-center space-x-3 cursor-pointer hover:opacity-80 transition-opacity"
           >
-            <div className="w-11 h-11 rounded-full bg-emerald-500/20 text-emerald-600 font-bold flex items-center justify-center text-base border border-emerald-500/30 overflow-hidden">
+            <div className="w-11 h-11 rounded-full bg-emerald-500/20 text-emerald-500 font-bold flex items-center justify-center text-base border border-emerald-500/30 overflow-hidden">
               {literature.author?.avatarUrl ? (
                 <img src={literature.author.avatarUrl} alt={literature.author.name} className="w-full h-full object-cover" />
               ) : (
@@ -117,9 +120,9 @@ export const ReadingPage: React.FC<ReadingPageProps> = ({
             </div>
             <div>
               <h3 className={`text-base font-semibold ${isBengali ? 'font-bnUI' : 'font-enUI'}`}>
-                {literature.author?.name || 'অজ্ঞাত লেখক'}
+                {literature.author?.name || 'Author'}
               </h3>
-              <p className="text-xs text-gray-500 font-enUI">@{literature.author?.username || 'author'}</p>
+              <p className="text-xs opacity-60 font-enUI">@{literature.author?.username || 'author'}</p>
             </div>
           </div>
 
@@ -135,12 +138,12 @@ export const ReadingPage: React.FC<ReadingPageProps> = ({
             {isFollowing ? (
               <>
                 <UserCheck className="w-3.5 h-3.5 text-emerald-500" />
-                <span>অনুসরণ করছেন</span>
+                <span>{t('following', uiLang)}</span>
               </>
             ) : (
               <>
                 <UserPlus className="w-3.5 h-3.5" />
-                <span>অনুসরণ করুন</span>
+                <span>{t('follow', uiLang)}</span>
               </>
             )}
           </button>
@@ -148,14 +151,8 @@ export const ReadingPage: React.FC<ReadingPageProps> = ({
 
         {/* Literature Title & Meta */}
         <div className="space-y-2 text-center pt-2">
-          <span className="text-xs px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 font-semibold font-bnUI inline-block">
-            {isBengali
-              ? literature.category === 'poem'
-                ? 'কবিতা'
-                : literature.category === 'story'
-                ? 'গল্প'
-                : 'অনুকবিতা'
-              : literature.category}
+          <span className="text-xs px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-500 font-semibold font-bnUI inline-block">
+            {literature.category === 'poem' ? t('poems', uiLang) : literature.category === 'story' ? t('stories', uiLang) : t('microPoetry', uiLang)}
           </span>
           <h1
             className={`text-3xl sm:text-4xl font-bold leading-tight ${
@@ -164,15 +161,15 @@ export const ReadingPage: React.FC<ReadingPageProps> = ({
           >
             {literature.title}
           </h1>
-          <div className="flex items-center justify-center space-x-4 text-xs opacity-75 pt-1 text-gray-500 font-bnUI">
+          <div className="flex items-center justify-center space-x-4 text-xs opacity-75 pt-1 font-bnUI">
             <span className="flex items-center space-x-1">
               <Clock className="w-3.5 h-3.5" />
-              <span>{isBengali ? `${literature.readingTimeMin || 1} মিনিট পাঠ` : `${literature.readingTimeMin || 1} min read`}</span>
+              <span>{literature.readingTimeMin || 1} {t('readTime', uiLang)}</span>
             </span>
             <span>•</span>
             <span className="flex items-center space-x-1">
               <Eye className="w-3.5 h-3.5" />
-              <span>{literature.viewsCount} দেখা হয়েছে</span>
+              <span>{literature.viewsCount} {t('views', uiLang)}</span>
             </span>
           </div>
         </div>
@@ -198,7 +195,7 @@ export const ReadingPage: React.FC<ReadingPageProps> = ({
             className={`flex items-center space-x-1.5 px-4 py-2 rounded-full text-xs font-semibold transition-all ${
               literature.is_liked
                 ? 'bg-rose-500/15 text-rose-500 border border-rose-500/30'
-                : 'bg-gray-500/10 hover:bg-gray-500/20 text-gray-600 dark:text-gray-300'
+                : 'bg-gray-500/10 hover:bg-gray-500/20'
             }`}
           >
             <Heart
@@ -206,23 +203,23 @@ export const ReadingPage: React.FC<ReadingPageProps> = ({
                 literature.is_liked ? 'fill-rose-500 text-rose-500 scale-110' : ''
               }`}
             />
-            <span className="font-bnUI">{literature.likesCount} লাইক</span>
+            <span className="font-bnUI">{literature.likesCount} {t('like', uiLang)}</span>
           </button>
 
           {/* Comment */}
           <button
             onClick={() => onComment(literature)}
-            className="flex items-center space-x-1.5 px-4 py-2 rounded-full text-xs font-semibold bg-gray-500/10 hover:bg-gray-500/20 text-gray-600 dark:text-gray-300 font-bnUI"
+            className="flex items-center space-x-1.5 px-4 py-2 rounded-full text-xs font-semibold bg-gray-500/10 hover:bg-gray-500/20 font-bnUI"
           >
             <MessageSquare className="w-4 h-4 text-emerald-500" />
-            <span>{literature.commentsCount} মন্তব্য</span>
+            <span>{literature.commentsCount} {t('comment', uiLang)}</span>
           </button>
 
           {/* Share */}
           <button
             onClick={handleShare}
-            className="p-2 rounded-full bg-gray-500/10 hover:bg-gray-500/20 text-gray-500 hover:text-gray-800 transition-colors"
-            title="শেয়ার করুন"
+            className="p-2 rounded-full bg-gray-500/10 hover:bg-gray-500/20 opacity-70 hover:opacity-100 transition-colors"
+            title={t('share', uiLang)}
           >
             <Share2 className="w-4 h-4" />
           </button>

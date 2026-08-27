@@ -1,5 +1,7 @@
 import React from 'react';
 import { Home, LayoutGrid, Users, BookmarkCheck, User } from 'lucide-react';
+import { useLanguageStore } from '../store/useLanguageStore';
+import { t } from '../utils/translations';
 
 interface BottomNavProps {
   activeTab: string;
@@ -7,12 +9,14 @@ interface BottomNavProps {
 }
 
 export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onTabChange }) => {
+  const { uiLang } = useLanguageStore();
+
   const tabs = [
-    { id: 'home', label: 'হোম', icon: Home },
-    { id: 'categories', label: 'বিভাগ', icon: LayoutGrid },
-    { id: 'following', label: 'অনুসৃত', icon: Users },
-    { id: 'offline', label: 'অফলাইন', icon: BookmarkCheck },
-    { id: 'profile', label: 'প্রোফাইল', icon: User },
+    { id: 'home', labelKey: 'navHome' as const, icon: Home },
+    { id: 'categories', labelKey: 'navCategories' as const, icon: LayoutGrid },
+    { id: 'following', labelKey: 'navFollowing' as const, icon: Users },
+    { id: 'offline', labelKey: 'navOffline' as const, icon: BookmarkCheck },
+    { id: 'profile', labelKey: 'navProfile' as const, icon: User },
   ];
 
   return (
@@ -28,11 +32,11 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onTabChange }) 
               className={`flex-1 flex flex-col items-center justify-center h-full py-1 min-h-[44px] transition-all relative ${
                 isActive
                   ? 'text-emerald-500 font-semibold scale-105'
-                  : 'opacity-60 hover:opacity-100 text-gray-500'
+                  : 'opacity-60 hover:opacity-100'
               }`}
             >
               <Icon className="w-5 h-5 mb-0.5" />
-              <span className="text-[11px] font-bnUI leading-tight">{tab.label}</span>
+              <span className="text-[11px] font-bnUI leading-tight">{t(tab.labelKey, uiLang)}</span>
               {isActive && (
                 <span className="absolute bottom-0 w-8 h-0.5 bg-emerald-500 rounded-full" />
               )}

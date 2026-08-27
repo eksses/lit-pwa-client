@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { BookOpen, Scroll, Feather, Sparkles } from 'lucide-react';
 import { Category, Literature } from '../types';
 import { useLiteratureList } from '../hooks/useLiterature';
+import { useLanguageStore } from '../store/useLanguageStore';
+import { t } from '../utils/translations';
 import { LiteratureCard } from '../components/LiteratureCard';
 
 interface CategoriesPageProps {
@@ -16,41 +18,46 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({
   onAuthorClick,
 }) => {
   const [selectedCat, setSelectedCat] = useState<Category>('poem');
+  const { uiLang } = useLanguageStore();
 
   const { data, isLoading } = useLiteratureList({ category: selectedCat });
 
   const categories = [
     {
       id: 'poem' as Category,
-      title: 'কবিতা',
+      title: t('poems', uiLang),
       subtitle: 'Poems & Verses',
-      desc: 'আবেগ ও ছন্দের ছন্দে গাঁথা নতুন ভাবনাসমূহ',
+      desc: t('categoryPoemsDesc', uiLang),
       icon: Feather,
-      color: 'from-emerald-500/20 to-teal-500/10 border-emerald-500/30 text-emerald-600',
+      color: 'from-emerald-500/20 to-teal-500/10 border-emerald-500/30 text-emerald-500',
     },
     {
       id: 'story' as Category,
-      title: 'গল্প',
+      title: t('stories', uiLang),
       subtitle: 'Short Stories',
-      desc: 'গল্প ও আখ্যানের এক মায়াবী অনাবিষ্কৃত জগত',
+      desc: t('categoryStoriesDesc', uiLang),
       icon: BookOpen,
-      color: 'from-amber-500/20 to-orange-500/10 border-amber-500/30 text-amber-600',
+      color: 'from-amber-500/20 to-orange-500/10 border-amber-500/30 text-amber-500',
     },
     {
       id: 'micro_poem' as Category,
-      title: 'অনুকবিতা',
+      title: t('microPoetry', uiLang),
       subtitle: 'Micro Poems & Haikus',
-      desc: 'স্বল্প কথায় অনুভূতির গভীরতম প্রকাশ',
+      desc: t('categoryMicroDesc', uiLang),
       icon: Scroll,
-      color: 'from-purple-500/20 to-indigo-500/10 border-purple-500/30 text-purple-600',
+      color: 'from-purple-500/20 to-indigo-500/10 border-purple-500/30 text-purple-500',
     },
   ];
 
   return (
     <div className="space-y-6 pb-20">
       <div>
-        <h2 className="text-xl font-bold font-bnUI tracking-tight">বিষয়ভিত্তিক সাহিত্য (Categories)</h2>
-        <p className="text-xs text-gray-500 font-bnUI">আপনার পছন্দের বিভাগে সাহিত্য অনুসন্ধান করুন</p>
+        <h2 className="text-xl font-bold font-bnUI tracking-tight">
+          {uiLang === 'bn' ? 'বিষয়ভিত্তিক সাহিত্য' : 'Explore by Category'}
+        </h2>
+        <p className="text-xs opacity-60 font-bnUI">
+          {uiLang === 'bn' ? 'আপনার পছন্দের বিভাগে নতুন সাহিত্য খুঁজুন' : 'Filter works by poetry, story, or micro-poetry'}
+        </p>
       </div>
 
       {/* Category Visual Cards Grid */}
@@ -74,7 +81,7 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({
                 <Icon className="w-6 h-6" />
                 {isSelected && (
                   <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500 text-white font-bnUI font-semibold">
-                    নির্বাচিত
+                    {uiLang === 'bn' ? 'নির্বাচিত' : 'Selected'}
                   </span>
                 )}
               </div>
@@ -92,11 +99,11 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({
           <h3 className="text-base font-bold font-bnUI flex items-center space-x-1.5">
             <Sparkles className="w-4 h-4 text-emerald-500" />
             <span>
-              {selectedCat === 'poem' ? 'কবিতাসমূহ' : selectedCat === 'story' ? 'গল্পসমূহ' : 'অনুকবিতাসমূহ'}
+              {selectedCat === 'poem' ? t('poems', uiLang) : selectedCat === 'story' ? t('stories', uiLang) : t('microPoetry', uiLang)}
             </span>
           </h3>
-          <span className="text-xs text-gray-500 font-bnUI">
-            {data?.items.length || 0} টি সাহিত্য পাওয়া গেছে
+          <span className="text-xs opacity-60 font-bnUI">
+            {data?.items.length || 0} {uiLang === 'bn' ? 'টি উপাদান' : 'works'}
           </span>
         </div>
 
@@ -107,8 +114,8 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({
             ))}
           </div>
         ) : !data || data.items.length === 0 ? (
-          <div className="p-8 text-center rounded-2xl border border-theme-main bg-theme-card text-gray-400 font-bnUI text-sm">
-            এই বিভাগে এখনো কোনো সাহিত্য প্রকাশ করা হয়নি।
+          <div className="p-8 text-center rounded-2xl border border-theme-main bg-theme-card opacity-70 font-bnUI text-sm">
+            {t('noResultsFound', uiLang)}
           </div>
         ) : (
           <div className="space-y-4">

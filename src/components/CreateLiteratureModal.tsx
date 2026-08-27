@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { X, Feather, Sparkles } from 'lucide-react';
 import { Category, Language } from '../types';
 import { useCreateLiterature } from '../hooks/useLiterature';
+import { useLanguageStore } from '../store/useLanguageStore';
+import { t } from '../utils/translations';
 
 interface CreateLiteratureModalProps {
   isOpen: boolean;
@@ -13,6 +15,7 @@ export const CreateLiteratureModal: React.FC<CreateLiteratureModalProps> = ({
   onClose,
 }) => {
   const createLiteratureMutation = useCreateLiterature();
+  const { uiLang } = useLanguageStore();
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -53,7 +56,7 @@ export const CreateLiteratureModal: React.FC<CreateLiteratureModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4 animate-in fade-in duration-200">
       <div
         className="w-full max-w-xl bg-theme-card border border-theme-main rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
         onClick={(e) => e.stopPropagation()}
@@ -62,11 +65,11 @@ export const CreateLiteratureModal: React.FC<CreateLiteratureModalProps> = ({
         <div className="p-4 border-b border-theme-main flex items-center justify-between bg-theme-main/50">
           <div className="flex items-center space-x-2">
             <Feather className="w-5 h-5 text-emerald-500" />
-            <h3 className="text-base font-bold font-bnUI">নতুন সাহিত্য রচনা প্রকাশ করুন</h3>
+            <h3 className="text-base font-bold font-bnUI">{t('publishHeader', uiLang)}</h3>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-full hover:bg-gray-500/20 text-gray-400 hover:text-gray-200 transition-colors"
+            className="p-1.5 rounded-full hover:bg-gray-500/20 opacity-70 hover:opacity-100 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -76,37 +79,37 @@ export const CreateLiteratureModal: React.FC<CreateLiteratureModalProps> = ({
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-5 space-y-4">
           {createLiteratureMutation.isError && (
             <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-500 text-xs font-bnUI">
-              লেখা প্রকাশ করতে ব্যর্থ হয়েছে। অনুগ্রহ করে পুনরায় চেষ্টা করুন।
+              {uiLang === 'bn' ? 'লেখা প্রকাশ করতে ব্যর্থ হয়েছে। পুনরায় চেষ্টা করুন।' : 'Failed to publish work. Please try again.'}
             </div>
           )}
 
           {/* Category & Language Selection */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-gray-500 mb-1 font-bnUI">
-                বিভাগ (Category)
+              <label className="block text-xs font-semibold opacity-75 mb-1 font-bnUI">
+                {t('categoryLabel', uiLang)}
               </label>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value as Category)}
                 className="w-full px-3 py-2 rounded-xl border border-theme-main bg-theme-main text-xs font-bnUI focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
               >
-                <option value="poem">কবিতা (Poem)</option>
-                <option value="story">গল্প (Story)</option>
-                <option value="micro_poem">অনুকবিতা (Micro-poem)</option>
+                <option value="poem">{t('poems', uiLang)}</option>
+                <option value="story">{t('stories', uiLang)}</option>
+                <option value="micro_poem">{t('microPoetry', uiLang)}</option>
               </select>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-gray-500 mb-1 font-bnUI">
-                ভাষা (Language)
+              <label className="block text-xs font-semibold opacity-75 mb-1 font-bnUI">
+                {t('languageLabel', uiLang)}
               </label>
               <select
                 value={language}
                 onChange={(e) => setLanguage(e.target.value as Language)}
                 className="w-full px-3 py-2 rounded-xl border border-theme-main bg-theme-main text-xs font-bnUI focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
               >
-                <option value="bn">বাংলা (Bengali)</option>
+                <option value="bn">বাংলা (Bangla)</option>
                 <option value="en">English</option>
               </select>
             </div>
@@ -114,8 +117,8 @@ export const CreateLiteratureModal: React.FC<CreateLiteratureModalProps> = ({
 
           {/* Title */}
           <div>
-            <label className="block text-xs font-semibold text-gray-500 mb-1 font-bnUI">
-              শিরোনাম (Title)
+            <label className="block text-xs font-semibold opacity-75 mb-1 font-bnUI">
+              {t('titleLabel', uiLang)}
             </label>
             <input
               type="text"
@@ -132,11 +135,11 @@ export const CreateLiteratureModal: React.FC<CreateLiteratureModalProps> = ({
           {/* Content */}
           <div>
             <div className="flex items-center justify-between mb-1">
-              <label className="block text-xs font-semibold text-gray-500 font-bnUI">
-                মূল বিষয়বস্তু / কবিতা (Content)
+              <label className="block text-xs font-semibold opacity-75 font-bnUI">
+                {t('contentLabel', uiLang)}
               </label>
-              <span className="text-[11px] text-gray-400 font-bnUI">
-                আনুমানিক পাঠ সময়: {readingTimeMin} মিনিট
+              <span className="text-[11px] opacity-60 font-bnUI">
+                {readingTimeMin} {t('readTime', uiLang)}
               </span>
             </div>
             <textarea
@@ -144,7 +147,7 @@ export const CreateLiteratureModal: React.FC<CreateLiteratureModalProps> = ({
               rows={8}
               placeholder={
                 language === 'bn'
-                  ? 'আপনার সুন্দর কবিতা বা গল্পের চরণগুলো লিখুন...'
+                  ? 'আপনার কবিতা বা গল্পের পর্বগুলো লিখুন...'
                   : 'Write your literature lines here...'
               }
               value={content}
@@ -162,7 +165,7 @@ export const CreateLiteratureModal: React.FC<CreateLiteratureModalProps> = ({
               onClick={onClose}
               className="px-4 py-2 rounded-xl text-xs font-medium opacity-70 hover:opacity-100 font-bnUI transition-opacity"
             >
-              বাতিল
+              {uiLang === 'bn' ? 'বাতিল' : 'Cancel'}
             </button>
             <button
               type="submit"
@@ -170,7 +173,7 @@ export const CreateLiteratureModal: React.FC<CreateLiteratureModalProps> = ({
               className="flex items-center space-x-1.5 px-5 py-2.5 rounded-xl bg-emerald-500 text-white font-medium text-xs shadow-md hover:bg-emerald-600 disabled:opacity-50 transition-all font-bnUI"
             >
               <Sparkles className="w-4 h-4" />
-              <span>{createLiteratureMutation.isPending ? 'প্রকাশ হচ্ছে...' : 'প্রকাশ করুন'}</span>
+              <span>{createLiteratureMutation.isPending ? t('publishing', uiLang) : t('publishButton', uiLang)}</span>
             </button>
           </div>
         </form>

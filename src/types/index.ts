@@ -83,6 +83,7 @@ export interface RegisterCredentials {
   password: string;
   bio?: string;
   avatarUrl?: string;
+  role?: string;
 }
 
 export interface CreateLiteratureInput {
