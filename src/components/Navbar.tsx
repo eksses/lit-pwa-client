@@ -1,5 +1,5 @@
-import React from 'react';
-import { Feather, Settings, PlusCircle, LogIn } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Feather, Settings, PlusCircle } from 'lucide-react';
 import { useAuthStore } from '../store/useAuthStore';
 import { useLanguageStore } from '../store/useLanguageStore';
 import { t } from '../utils/translations';
@@ -20,10 +20,32 @@ export const Navbar: React.FC<NavbarProps> = ({
   const { user, isAuthenticated } = useAuthStore();
   const { uiLang } = useLanguageStore();
 
+  const [isVisible, setIsVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
   const isWriter = isAuthenticated && (user?.role === 'writer' || user?.role === 'author' || user?.role === 'admin');
 
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      if (currentScrollY > 60 && currentScrollY > lastScrollY) {
+        setIsVisible(false); // Scroll down -> hide header (Instagram/FB mobile style)
+      } else {
+        setIsVisible(true); // Scroll up -> reveal header instantly
+      }
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
+
   return (
-    <header className="sticky top-0 z-40 backdrop-blur-md bg-theme-main/90 border-b border-theme-main/50 transition-colors duration-200">
+    <header
+      className={`sticky top-0 z-40 backdrop-blur-md bg-theme-main/90 border-b border-theme-main/50 transition-transform duration-300 ${
+        isVisible ? 'translate-y-0' : '-translate-y-full'
+      }`}
+    >
       <div className="max-w-xl mx-auto px-4 py-3 flex items-center justify-between">
         {/* Minimal Brand Logo */}
         <button
