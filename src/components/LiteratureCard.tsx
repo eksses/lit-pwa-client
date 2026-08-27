@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heart, MessageSquare, Eye, Clock, Bookmark, Share2 } from 'lucide-react';
+import { Heart, MessageSquare, Clock, Bookmark, Share2 } from 'lucide-react';
 import { Literature } from '../types';
 import { useToggleLike } from '../hooks/useLiterature';
 import { useReaderStore } from '../store/useReaderStore';
@@ -77,65 +77,47 @@ export const LiteratureCard: React.FC<LiteratureCardProps> = ({
   return (
     <article
       onClick={() => onRead(item)}
-      className="p-5 rounded-3xl border border-theme-main/50 bg-theme-card shadow-sm hover:shadow-md transition-all cursor-pointer space-y-4 group relative overflow-hidden active:scale-[0.99]"
+      className="p-5 sm:p-6 rounded-3xl border border-theme-main/50 bg-theme-card shadow-sm hover:shadow-md transition-all cursor-pointer space-y-3.5 group relative overflow-hidden"
     >
-      {/* Facebook/Instagram-Style Author Header & Category */}
+      {/* Clean Author Header & Badges */}
       <div className="flex items-center justify-between gap-2">
         <div
           onClick={(e) => {
             e.stopPropagation();
             if (onAuthorClick) onAuthorClick(item.authorId || item.author.id);
           }}
-          className="flex items-center space-x-3 hover:opacity-85 transition-opacity cursor-pointer"
+          className="flex items-center space-x-2.5 hover:opacity-85 transition-opacity cursor-pointer"
         >
-          <div className="p-[1.5px] rounded-full bg-gradient-to-tr from-emerald-500 to-teal-400 shrink-0">
-            <div className="w-9 h-9 rounded-full bg-theme-card text-emerald-500 font-bold flex items-center justify-center text-sm border border-emerald-500/20 overflow-hidden">
-              {item.author?.avatarUrl ? (
-                <img src={item.author.avatarUrl} alt={item.author.name} className="w-full h-full object-cover rounded-full" />
-              ) : (
-                item.author?.name?.charAt(0).toUpperCase() || 'A'
-              )}
-            </div>
+          <div className="w-8 h-8 rounded-full bg-emerald-500/15 text-emerald-500 font-bold flex items-center justify-center text-xs border border-emerald-500/20 overflow-hidden shrink-0">
+            {item.author?.avatarUrl ? (
+              <img src={item.author.avatarUrl} alt={item.author.name} className="w-full h-full object-cover rounded-full" />
+            ) : (
+              item.author?.name?.charAt(0).toUpperCase() || 'A'
+            )}
           </div>
           <div>
-            <h4 className={`text-sm font-bold leading-tight group-hover:text-emerald-500 transition-colors ${isBengali ? 'font-bnUI' : 'font-enUI'}`}>
+            <h4 className={`text-xs font-bold leading-tight group-hover:text-emerald-500 transition-colors ${isBengali ? 'font-bnUI' : 'font-enUI'}`}>
               {item.author?.name || (uiLang === 'bn' ? 'অজ্ঞাত লেখক' : 'Unknown Author')}
             </h4>
-            <div className="flex items-center space-x-1.5 text-[11px] opacity-60 font-enUI">
-              <span>@{item.author?.username || 'writer'}</span>
-              <span>•</span>
-              <span className="flex items-center space-x-0.5">
-                <Clock className="w-3 h-3 inline" />
-                <span>{item.readingTimeMin || 1}m read</span>
-              </span>
-            </div>
+            <p className="text-[10px] opacity-60 font-enUI">@{item.author?.username || 'writer'}</p>
           </div>
         </div>
 
-        <div className="flex items-center space-x-1.5">
+        <div className="flex items-center space-x-1.5 text-[11px] font-bnUI">
           {isRead && (
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 font-semibold font-bnUI flex items-center space-x-0.5">
+            <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 font-semibold flex items-center space-x-0.5">
               <span>✓</span>
               <span>{uiLang === 'bn' ? 'পঠিত' : 'Read'}</span>
             </span>
           )}
-          <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 font-semibold font-bnUI">
+          <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 font-semibold">
             {categoryLabelMap[item.category] || item.category}
           </span>
-          <button
-            onClick={handleSave}
-            className={`p-2 rounded-full transition-all active:scale-90 ${
-              saved ? 'text-emerald-500 bg-emerald-500/10' : 'opacity-60 hover:opacity-100 hover:bg-gray-500/10'
-            }`}
-            title={saved ? t('savedOffline', uiLang) : t('saveOffline', uiLang)}
-          >
-            <Bookmark className={`w-4 h-4 ${saved ? 'fill-emerald-500' : ''}`} />
-          </button>
         </div>
       </div>
 
-      {/* Content Preview */}
-      <div className="space-y-2">
+      {/* Literature Body */}
+      <div className="space-y-1.5">
         <h3
           className={`text-xl font-bold leading-snug group-hover:text-emerald-500 transition-colors ${
             isBengali ? 'font-bnSerif' : 'font-enSerif'
@@ -152,43 +134,63 @@ export const LiteratureCard: React.FC<LiteratureCardProps> = ({
         </p>
       </div>
 
-      {/* Facebook-Style Equal 3-Column Action Bar */}
-      <div className="pt-2 border-t border-theme-main/40 flex items-center justify-between text-xs">
-        {/* Like */}
-        <button
-          onClick={handleLike}
-          disabled={toggleLikeMutation.isPending}
-          className={`flex-1 flex items-center justify-center space-x-1.5 py-2 rounded-xl text-xs font-semibold transition-all active:scale-95 ${
-            item.is_liked
-              ? 'bg-rose-500/15 text-rose-500 font-bold'
-              : 'opacity-70 hover:opacity-100 hover:bg-gray-500/10'
-          }`}
-        >
-          <Heart
-            className={`w-4 h-4 transition-transform duration-200 ${
-              item.is_liked ? 'fill-rose-500 text-rose-500 scale-110' : ''
+      {/* Clean Bottom Action Row */}
+      <div className="pt-2 border-t border-theme-main/30 flex items-center justify-between text-xs opacity-80">
+        <div className="flex items-center space-x-3 opacity-70 text-[11px] font-bnUI">
+          <span className="flex items-center space-x-1">
+            <Clock className="w-3.5 h-3.5" />
+            <span>{item.readingTimeMin || 1} {t('readTime', uiLang)}</span>
+          </span>
+        </div>
+
+        <div className="flex items-center space-x-1">
+          {/* Like */}
+          <button
+            onClick={handleLike}
+            disabled={toggleLikeMutation.isPending}
+            className={`flex items-center space-x-1 px-3 py-1 rounded-full text-xs font-medium transition-all ${
+              item.is_liked
+                ? 'bg-rose-500/15 text-rose-500 font-bold border border-rose-500/30'
+                : 'hover:bg-gray-500/10 opacity-70 hover:opacity-100'
             }`}
-          />
-          <span className="font-bnUI">{item.likesCount > 0 ? item.likesCount : (uiLang === 'bn' ? 'লাইক' : 'Like')}</span>
-        </button>
+          >
+            <Heart
+              className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                item.is_liked ? 'fill-rose-500 text-rose-500 scale-110' : ''
+              }`}
+            />
+            <span className="font-bnUI">{item.likesCount}</span>
+          </button>
 
-        {/* Comment */}
-        <button
-          onClick={handleCommentClick}
-          className="flex-1 flex items-center justify-center space-x-1.5 py-2 rounded-xl text-xs font-semibold opacity-70 hover:opacity-100 hover:bg-gray-500/10 transition-all active:scale-95 font-bnUI"
-        >
-          <MessageSquare className="w-4 h-4 text-emerald-500" />
-          <span>{item.commentsCount > 0 ? item.commentsCount : (uiLang === 'bn' ? 'মন্তব্য' : 'Comment')}</span>
-        </button>
+          {/* Comment */}
+          <button
+            onClick={handleCommentClick}
+            className="flex items-center space-x-1 px-3 py-1 rounded-full text-xs font-medium opacity-70 hover:opacity-100 hover:bg-gray-500/10 transition-colors font-bnUI"
+          >
+            <MessageSquare className="w-3.5 h-3.5 text-emerald-500" />
+            <span>{item.commentsCount}</span>
+          </button>
 
-        {/* Share */}
-        <button
-          onClick={handleShare}
-          className="flex-1 flex items-center justify-center space-x-1.5 py-2 rounded-xl text-xs font-semibold opacity-70 hover:opacity-100 hover:bg-gray-500/10 transition-all active:scale-95 font-bnUI"
-        >
-          <Share2 className="w-4 h-4" />
-          <span>{uiLang === 'bn' ? 'শেয়ার' : 'Share'}</span>
-        </button>
+          {/* Save / Bookmark */}
+          <button
+            onClick={handleSave}
+            className={`p-1.5 rounded-full transition-colors ${
+              saved ? 'text-emerald-500 bg-emerald-500/10' : 'opacity-60 hover:opacity-100 hover:bg-gray-500/10'
+            }`}
+            title={saved ? t('savedOffline', uiLang) : t('saveOffline', uiLang)}
+          >
+            <Bookmark className={`w-3.5 h-3.5 ${saved ? 'fill-emerald-500' : ''}`} />
+          </button>
+
+          {/* Share */}
+          <button
+            onClick={handleShare}
+            className="p-1.5 rounded-full opacity-60 hover:opacity-100 hover:bg-gray-500/10 transition-colors"
+            title={t('share', uiLang)}
+          >
+            <Share2 className="w-3.5 h-3.5" />
+          </button>
+        </div>
       </div>
     </article>
   );
