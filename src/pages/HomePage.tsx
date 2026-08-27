@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Sparkles, RefreshCw, Feather } from 'lucide-react';
+import { Search, Sparkles, RefreshCw, Feather, TrendingUp, Flame } from 'lucide-react';
 import { Category, Language, Literature } from '../types';
 import { useLiteratureList } from '../hooks/useLiterature';
 import { useAuthStore } from '../store/useAuthStore';
@@ -23,6 +23,7 @@ export const HomePage: React.FC<HomePageProps> = ({
   onOpenCreate,
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<'all' | Category>('all');
+  const [sortAlgo, setSortAlgo] = useState<'trending' | 'latest' | 'top'>('trending');
   const [searchQuery, setSearchQuery] = useState('');
 
   const { user, isAuthenticated } = useAuthStore();
@@ -33,6 +34,7 @@ export const HomePage: React.FC<HomePageProps> = ({
   const { data, isLoading, isError, refetch } = useLiteratureList({
     category: selectedCategory === 'all' ? undefined : selectedCategory,
     language: langFilter === 'all' ? undefined : langFilter,
+    sort: sortAlgo,
   });
 
   const categories = [
@@ -96,24 +98,70 @@ export const HomePage: React.FC<HomePageProps> = ({
           )}
         </div>
 
-        {/* Category Pill Tabs */}
-        <div className="flex items-center space-x-2 overflow-x-auto pb-1 no-scrollbar text-xs font-bnUI">
-          {categories.map((cat) => {
-            const isActive = selectedCategory === cat.id;
-            return (
+        {/* Feed Algorithm & Category Controls */}
+        <div className="space-y-2">
+          {/* Category Pill Tabs */}
+          <div className="flex items-center space-x-2 overflow-x-auto pb-1 no-scrollbar text-xs font-bnUI">
+            {categories.map((cat) => {
+              const isActive = selectedCategory === cat.id;
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => setSelectedCategory(cat.id as any)}
+                  className={`px-3.5 py-1.5 rounded-full whitespace-nowrap font-medium transition-all ${
+                    isActive
+                      ? 'bg-emerald-500 text-white shadow-sm'
+                      : 'bg-theme-card border border-theme-main opacity-80 hover:opacity-100'
+                  }`}
+                >
+                  {cat.label}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Algorithm Feed Sorting Bar */}
+          <div className="flex items-center justify-between pt-1 font-bnUI border-b border-theme-main/40 pb-2">
+            <div className="flex items-center space-x-1.5 text-xs">
               <button
-                key={cat.id}
-                onClick={() => setSelectedCategory(cat.id as any)}
-                className={`px-3.5 py-1.5 rounded-full whitespace-nowrap font-medium transition-all ${
-                  isActive
-                    ? 'bg-emerald-500 text-white shadow-sm'
-                    : 'bg-theme-card border border-theme-main opacity-80 hover:opacity-100'
+                onClick={() => setSortAlgo('trending')}
+                className={`px-3 py-1 rounded-full transition-all flex items-center space-x-1 ${
+                  sortAlgo === 'trending'
+                    ? 'bg-emerald-500/15 text-emerald-500 font-bold border border-emerald-500/30 shadow-sm'
+                    : 'opacity-60 hover:opacity-100'
                 }`}
               >
-                {cat.label}
+                <TrendingUp className="w-3.5 h-3.5" />
+                <span>{uiLang === 'bn' ? 'জনপ্রিয়' : 'Trending'}</span>
               </button>
-            );
-          })}
+              <button
+                onClick={() => setSortAlgo('latest')}
+                className={`px-3 py-1 rounded-full transition-all flex items-center space-x-1 ${
+                  sortAlgo === 'latest'
+                    ? 'bg-emerald-500/15 text-emerald-500 font-bold border border-emerald-500/30 shadow-sm'
+                    : 'opacity-60 hover:opacity-100'
+                }`}
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>{uiLang === 'bn' ? 'সাম্প্রতিক' : 'Latest'}</span>
+              </button>
+              <button
+                onClick={() => setSortAlgo('top')}
+                className={`px-3 py-1 rounded-full transition-all flex items-center space-x-1 ${
+                  sortAlgo === 'top'
+                    ? 'bg-emerald-500/15 text-emerald-500 font-bold border border-emerald-500/30 shadow-sm'
+                    : 'opacity-60 hover:opacity-100'
+                }`}
+              >
+                <Flame className="w-3.5 h-3.5 text-amber-500" />
+                <span>{uiLang === 'bn' ? 'সেরা' : 'Top Rated'}</span>
+              </button>
+            </div>
+
+            <span className="text-[11px] opacity-50 font-bnUI hidden sm:inline">
+              {filteredItems.length} {uiLang === 'bn' ? 'টি লেখা' : 'works'}
+            </span>
+          </div>
         </div>
       </div>
 

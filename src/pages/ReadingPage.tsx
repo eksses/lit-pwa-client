@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Sliders, Heart, MessageSquare, Bookmark, Share2, UserPlus, UserCheck, Eye, Clock } from 'lucide-react';
 import { Literature } from '../types';
 import { useReaderStore } from '../store/useReaderStore';
@@ -28,6 +28,7 @@ export const ReadingPage: React.FC<ReadingPageProps> = ({
   const { fontSize, toggleSaveOffline, isSavedOffline } = useReaderStore();
   const { uiLang } = useLanguageStore();
   const [showControls, setShowControls] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
 
   const toggleLikeMutation = useToggleLike();
   const toggleFollowMutation = useToggleFollow();
@@ -38,6 +39,18 @@ export const ReadingPage: React.FC<ReadingPageProps> = ({
   const isBengali = literature.language === 'bn';
   const saved = isSavedOffline(literature.id);
   const isFollowing = authorProfile?.is_following ?? false;
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+      if (totalHeight > 0) {
+        const progress = (window.scrollY / totalHeight) * 100;
+        setScrollProgress(Math.min(100, Math.max(0, progress)));
+      }
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleLike = () => {
     toggleLikeMutation.mutate(literature.id);
@@ -102,6 +115,12 @@ export const ReadingPage: React.FC<ReadingPageProps> = ({
             <Sliders className="w-5 h-5" />
           </button>
         </div>
+
+        {/* Scroll Reading Progress Accent Bar */}
+        <div
+          className="absolute bottom-0 left-0 h-0.5 bg-emerald-500 transition-all duration-75"
+          style={{ width: `${scrollProgress}%` }}
+        />
       </header>
 
       {/* Floating Reader Controls Panel */}
