@@ -31,15 +31,21 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   login: async (credentials) => {
-    const response = await api.post<{ user: User }>('/auth/login', credentials);
-    const user = response.data.user;
+    const response = await api.post<{ user: User; token?: string }>('/auth/login', credentials);
+    const { user, token } = response.data;
+    if (token) {
+      localStorage.setItem('lit_auth_token', token);
+    }
     set({ user, isAuthenticated: true });
     return user;
   },
 
   register: async (credentials) => {
-    const response = await api.post<{ user: User }>('/auth/register', credentials);
-    const user = response.data.user;
+    const response = await api.post<{ user: User; token?: string }>('/auth/register', credentials);
+    const { user, token } = response.data;
+    if (token) {
+      localStorage.setItem('lit_auth_token', token);
+    }
     set({ user, isAuthenticated: true });
     return user;
   },
@@ -48,6 +54,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       await api.post('/auth/logout');
     } finally {
+      localStorage.removeItem('lit_auth_token');
       set({ user: null, isAuthenticated: false });
     }
   },

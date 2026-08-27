@@ -18,8 +18,14 @@ api.interceptors.request.use(
       if (fingerprint) {
         config.headers.set('x-device-fingerprint', fingerprint);
       }
+
+      // Inject Bearer token from localStorage if present
+      const token = localStorage.getItem('lit_auth_token');
+      if (token) {
+        config.headers.set('Authorization', `Bearer ${token}`);
+      }
     } catch (err) {
-      console.warn('Failed to attach x-device-fingerprint header:', err);
+      console.warn('Failed to attach auth headers:', err);
     }
     return config;
   },
