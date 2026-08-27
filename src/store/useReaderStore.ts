@@ -6,10 +6,13 @@ interface ReaderState {
   theme: Theme;
   fontSize: number;
   savedItems: Literature[];
+  readHistoryIds: string[];
   setTheme: (theme: Theme) => void;
   setFontSize: (size: number) => void;
   toggleSaveOffline: (item: Literature) => void;
+  autoCacheItem: (item: Literature) => void;
   isSavedOffline: (id: string) => boolean;
+  hasRead: (id: string) => boolean;
 }
 
 export const useReaderStore = create<ReaderState>()(
@@ -18,6 +21,7 @@ export const useReaderStore = create<ReaderState>()(
       theme: 'light',
       fontSize: 16,
       savedItems: [],
+      readHistoryIds: [],
 
       setTheme: (theme: Theme) => set({ theme }),
 
@@ -33,8 +37,22 @@ export const useReaderStore = create<ReaderState>()(
         }
       },
 
+      autoCacheItem: (item: Literature) => {
+        const { savedItems, readHistoryIds } = get();
+        const exists = savedItems.some((saved) => saved.id === item.id);
+        const newSavedItems = exists ? savedItems : [item, ...savedItems];
+        const newReadIds = readHistoryIds.includes(item.id)
+          ? readHistoryIds
+          : [...readHistoryIds, item.id];
+        set({ savedItems: newSavedItems, readHistoryIds: newReadIds });
+      },
+
       isSavedOffline: (id: string) => {
         return get().savedItems.some((item) => item.id === id);
+      },
+
+      hasRead: (id: string) => {
+        return (get().readHistoryIds || []).includes(id);
       },
     }),
     {

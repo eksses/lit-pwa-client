@@ -21,10 +21,11 @@ export const LiteratureCard: React.FC<LiteratureCardProps> = ({
   onAuthorClick,
 }) => {
   const toggleLikeMutation = useToggleLike();
-  const { toggleSaveOffline, isSavedOffline } = useReaderStore();
+  const { toggleSaveOffline, isSavedOffline, hasRead } = useReaderStore();
   const { uiLang } = useLanguageStore();
   const { showToast } = useToastStore();
   const saved = isSavedOffline(item.id);
+  const isRead = hasRead(item.id);
 
   const isBengali = item.language === 'bn';
 
@@ -111,7 +112,13 @@ export const LiteratureCard: React.FC<LiteratureCardProps> = ({
           </div>
         </div>
 
-        <div className="flex items-center space-x-1">
+        <div className="flex items-center space-x-1.5">
+          {isRead && (
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 font-semibold font-bnUI flex items-center space-x-0.5">
+              <span>✓</span>
+              <span>{uiLang === 'bn' ? 'পঠিত' : 'Read'}</span>
+            </span>
+          )}
           <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 font-semibold font-bnUI">
             {categoryLabelMap[item.category] || item.category}
           </span>

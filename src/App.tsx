@@ -20,7 +20,7 @@ import { useReaderStore } from './store/useReaderStore';
 
 export default function App() {
   const { checkAuth, isAuthenticated } = useAuthStore();
-  const { theme, setTheme } = useReaderStore();
+  const { theme, setTheme, autoCacheItem } = useReaderStore();
 
   const [activeTab, setActiveTab] = useState<string>('home');
   const [langFilter, setLangFilter] = useState<'all' | Language>('all');
@@ -50,6 +50,7 @@ export default function App() {
 
   const handleReadLiterature = (item: Literature) => {
     setActiveLiterature(item);
+    autoCacheItem(item);
   };
 
   const handleOpenComment = (item: Literature) => {
