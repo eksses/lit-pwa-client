@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../utils/api';
 import { useReaderStore } from '../store/useReaderStore';
+import { useAuthStore } from '../store/useAuthStore';
 import {
   Literature,
   LiteratureListResponse,
@@ -28,6 +29,7 @@ export function useLiteratureList(params?: UseLiteratureListParams) {
     },
   });
 }
+
 export function useLiteratureDetail(slugOrId: string) {
   return useQuery({
     queryKey: ['literature', 'detail', slugOrId],
@@ -154,6 +156,18 @@ export function useToggleLike() {
   });
 }
 
+export function useComments(literatureId: string) {
+  return useQuery({
+    queryKey: ['literature', 'comments', literatureId],
+    queryFn: async () => {
+      if (!literatureId) return [];
+      const response = await api.get<{ comments: Comment[] }>(`/literature/${literatureId}/comments`);
+      return response.data.comments;
+    },
+    enabled: Boolean(literatureId),
+  });
+}
+
 export function useAddComment() {
   const queryClient = useQueryClient();
 
@@ -174,9 +188,74 @@ export function useAddComment() {
       });
       return response.data;
     },
-    onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['literature', 'detail', variables.literatureId] });
-      queryClient.invalidateQueries({ queryKey: ['literature', 'list'] });
+    onMutate: async ({ literatureId, content, guestName }) => {
+      await queryClient.cancelQueries({ queryKey: ['literature', 'comments', literatureId] });
+
+      const previousComments = queryClient.getQueryData<Comment[]>(['literature', 'comments', literatureId]);
+
+      const authUser = useAuthStore.getState().user;
+      const optimisticComment: Comment = {
+        id: `temp-${Date.now()}`,
+        literatureId,
+        content,
+        guestName: !authUser ? (guestName || 'Guest Reader') : null,
+        user: authUser ? {
+          id: authUser.id,
+          name: authUser.name,
+          username: authUser.username,
+          email: authUser.email,
+          avatarUrl: authUser.avatarUrl,
+        } : null,
+        createdAt: new Date().toISOString(),
+      };
+
+      queryClient.setQueryData<Comment[]>(
+        ['literature', 'comments', literatureId],
+        (old) => (old ? [...old, optimisticComment] : [optimisticComment])
+      );
+
+      // Increment commentsCount on literature cards instantly
+      queryClient.setQueriesData<LiteratureListResponse>(
+        { queryKey: ['literature', 'list'] },
+        (old) => {
+          if (!old || !old.items) return old;
+          return {
+            ...old,
+            items: old.items.map((item) =>
+              item.id === literatureId || item.slug === literatureId
+                ? { ...item, commentsCount: item.commentsCount + 1 }
+                : item
+            ),
+          };
+        }
+      );
+
+      queryClient.setQueriesData<LiteratureListResponse>(
+        { queryKey: ['feed'] },
+        (old) => {
+          if (!old || !old.items) return old;
+          return {
+            ...old,
+            items: old.items.map((item) =>
+              item.id === literatureId || item.slug === literatureId
+                ? { ...item, commentsCount: item.commentsCount + 1 }
+                : item
+            ),
+          };
+        }
+      );
+
+      return { previousComments };
+    },
+    onError: (_err, variables, context) => {
+      if (context?.previousComments) {
+        queryClient.setQueryData(['literature', 'comments', variables.literatureId], context.previousComments);
+      }
+    },
+    onSettled: (_data, _err, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['literature', 'comments', variables.literatureId] });
+      queryClient.invalidateQueries({ queryKey: ['literature'] });
+      queryClient.invalidateQueries({ queryKey: ['feed'] });
     },
   });
 }
@@ -214,6 +293,16 @@ export function useDeleteLiterature() {
       const response = await api.delete<{ success: boolean; message: string }>(`/literature/${id}`);
       return response.data;
     },
+    onMutate: async (id: string) => {
+      queryClient.setQueriesData<LiteratureListResponse>(
+        { queryKey: ['literature', 'list'] },
+        (old) => (old ? { ...old, items: old.items.filter((item) => item.id !== id && item.slug !== id) } : old)
+      );
+      queryClient.setQueriesData<LiteratureListResponse>(
+        { queryKey: ['feed'] },
+        (old) => (old ? { ...old, items: old.items.filter((item) => item.id !== id && item.slug !== id) } : old)
+      );
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['literature'] });
       queryClient.invalidateQueries({ queryKey: ['feed'] });
@@ -229,8 +318,15 @@ export function useDeleteComment() {
       const response = await api.delete<{ success: boolean; message: string }>(`/literature/comments/${commentId}`);
       return response.data;
     },
+    onMutate: async (commentId: string) => {
+      queryClient.setQueriesData<Comment[]>(
+        { queryKey: ['literature', 'comments'] },
+        (old) => (old ? old.filter((c) => c.id !== commentId) : old)
+      );
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['literature'] });
+      queryClient.invalidateQueries({ queryKey: ['feed'] });
     },
   });
 }

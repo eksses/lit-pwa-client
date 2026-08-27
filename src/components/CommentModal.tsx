@@ -4,7 +4,7 @@ import { Literature } from '../types';
 import { useAuthStore } from '../store/useAuthStore';
 import { useLanguageStore } from '../store/useLanguageStore';
 import { t } from '../utils/translations';
-import { useAddComment, useDeleteComment } from '../hooks/useLiterature';
+import { useAddComment, useDeleteComment, useComments } from '../hooks/useLiterature';
 
 interface CommentModalProps {
   isOpen: boolean;
@@ -15,13 +15,17 @@ interface CommentModalProps {
 export const CommentModal: React.FC<CommentModalProps> = ({ isOpen, onClose, literature }) => {
   const { user, isAuthenticated } = useAuthStore();
   const { uiLang } = useLanguageStore();
-  const addCommentMutation = useAddComment();
-  const deleteCommentMutation = useDeleteComment();
 
   const [content, setContent] = useState('');
   const [guestName, setGuestName] = useState(() => {
     return localStorage.getItem('lit_pwa_guest_nickname') || '';
   });
+
+  const targetId = literature?.id || '';
+  const { data: fetchedComments, isLoading: isCommentsLoading } = useComments(isOpen ? targetId : '');
+
+  const addCommentMutation = useAddComment();
+  const deleteCommentMutation = useDeleteComment();
 
   useEffect(() => {
     if (guestName) {
@@ -50,7 +54,7 @@ export const CommentModal: React.FC<CommentModalProps> = ({ isOpen, onClose, lit
   };
 
   const isBengali = literature.language === 'bn';
-  const commentsList = literature.comments || [];
+  const commentsList = fetchedComments || literature.comments || [];
   const postAuthorId = literature.authorId || literature.author?.id;
 
   return (
@@ -85,9 +89,14 @@ export const CommentModal: React.FC<CommentModalProps> = ({ isOpen, onClose, lit
 
         {/* Comments List */}
         <div className="flex-1 overflow-y-auto p-4 space-y-3 divide-y divide-theme-main/40">
-          {commentsList.length === 0 ? (
+          {isCommentsLoading ? (
+            <div className="py-8 text-center opacity-60 space-y-2 font-bnUI">
+              <div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto" />
+              <p className="text-xs">{uiLang === 'bn' ? 'মন্তব্য লোড হচ্ছে...' : 'Loading comments...'}</p>
+            </div>
+          ) : commentsList.length === 0 ? (
             <div className="py-8 text-center opacity-60 space-y-1">
-              <MessageSquare className="w-8 h-8 mx-auto opacity-50" />
+              <MessageSquare className="w-8 h-8 mx-auto opacity-50 text-emerald-500" />
               <p className="text-sm font-bnUI">{t('noCommentsYet', uiLang)}</p>
             </div>
           ) : (
@@ -104,7 +113,7 @@ export const CommentModal: React.FC<CommentModalProps> = ({ isOpen, onClose, lit
                       <UserIcon className="w-3.5 h-3.5" />
                       <span className="font-bnUI">{commentatorName}</span>
                       {!comment.user && (
-                        <span className="text-[10px] px-1.5 py-0.2 rounded bg-gray-500/10 opacity-70">
+                        <span className="text-[10px] px-1.5 py-0.2 rounded bg-gray-500/10 opacity-70 font-bnUI">
                           {uiLang === 'bn' ? 'গেস্ট' : 'Guest'}
                         </span>
                       )}
