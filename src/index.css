@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-main: #ffffff;
+    --text-main: #111827;
+    --bg-card: #f9fafb;
+    --border-main: #e5e7eb;
+  }
+
+  html.theme-sepia {
+    --bg-main: #fbf0d9;
+    --text-main: #2d2318;
+    --bg-card: #f4e7ca;
+    --border-main: #e4d3ab;
+  }
+
+  html.theme-dark {
+    --bg-main: #121212;
+    --text-main: #e5e7eb;
+    --bg-card: #1e1e1e;
+    --border-main: #2a2a2a;
+  }
+
+  body {
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    transition: background-color 0.2s ease, color 0.2s ease;
+    font-family: 'Hind Siliguri', 'Inter', sans-serif;
+  }
+}
+
+/* Custom theme helper classes */
+.bg-theme-main {
+  background-color: var(--bg-main);
+}
+
+.text-theme-main {
+  color: var(--text-main);
+}
+
+.bg-theme-card {
+  background-color: var(--bg-card);
+}
+
+.border-theme-main {
+  border-color: var(--border-main);
+}
+
+/* Typography Helpers */
+.font-bn-ui {
+  font-family: 'Hind Siliguri', sans-serif;
+}
+
+.font-bn-serif {
+  font-family: 'Noto Serif Bengali', serif;
+}
+
+.font-en-ui {
+  font-family: 'Inter', sans-serif;
+}
+
+.font-en-serif {
+  font-family: 'Merriweather', serif;
+}
