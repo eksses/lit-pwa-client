@@ -1,8 +1,10 @@
 import axios from 'axios';
 import { getDeviceFingerprint } from './fingerprint';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://lit-api-backend.vercel.app/api';
+
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api',
+  baseURL: API_BASE_URL,
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
