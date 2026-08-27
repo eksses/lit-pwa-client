@@ -7,6 +7,7 @@ export type Category =
   | 'serial_story' 
   | 'long_story' 
   | 'collection' 
+  | 'philosophy'
   | 'uncategorized' 
   | 'other';
 

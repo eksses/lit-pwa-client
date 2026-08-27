@@ -49,6 +49,7 @@ export const LiteratureCard: React.FC<LiteratureCardProps> = ({
     serial_story: t('serialStory', uiLang),
     long_story: t('longStory', uiLang),
     collection: t('collection', uiLang),
+    philosophy: t('philosophy', uiLang),
     uncategorized: t('uncategorized', uiLang),
     other: t('uncategorized', uiLang),
   };

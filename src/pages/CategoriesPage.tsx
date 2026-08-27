@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BookOpen, Scroll, Feather, Sparkles, Search, User as UserIcon, Users, ArrowRight, Trash2 } from 'lucide-react';
+import { BookOpen, Scroll, Feather, Sparkles, Search, User as UserIcon, Users, ArrowRight, Trash2, Brain } from 'lucide-react';
 import { Category, Literature } from '../types';
 import { useLiteratureList } from '../hooks/useLiterature';
 import { useAuthorsList, useDeleteUser } from '../hooks/useAuthors';
@@ -51,6 +51,7 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({
     { id: 'serial_story', label: t('serialStory', uiLang), icon: Scroll },
     { id: 'long_story', label: t('longStory', uiLang), icon: BookOpen },
     { id: 'collection', label: t('collection', uiLang), icon: Sparkles },
+    { id: 'philosophy', label: t('philosophy', uiLang), icon: Brain },
     { id: 'uncategorized', label: t('uncategorized', uiLang), icon: BookOpen },
     { id: 'authors', label: uiLang === 'bn' ? 'লেখকবৃন্দ' : 'Authors', icon: Users },
   ];

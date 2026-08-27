@@ -119,6 +119,7 @@ export const CreateLiteratureModal: React.FC<CreateLiteratureModalProps> = ({
                 <option value="serial_story" className="bg-theme-card text-theme-main">🔖 {t('serialStory', uiLang)}</option>
                 <option value="long_story" className="bg-theme-card text-theme-main">📜 {t('longStory', uiLang)}</option>
                 <option value="collection" className="bg-theme-card text-theme-main">🎨 {t('collection', uiLang)}</option>
+                <option value="philosophy" className="bg-theme-card text-theme-main">🧠 {t('philosophy', uiLang)}</option>
                 <option value="uncategorized" className="bg-theme-card text-theme-main">📂 {t('uncategorized', uiLang)}</option>
               </select>
             </div>
