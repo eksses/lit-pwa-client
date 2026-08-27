@@ -14,7 +14,7 @@ export interface UseLiteratureListParams {
   category?: Category;
   language?: Language;
   author_id?: string;
-  sort?: 'trending' | 'latest' | 'top';
+  sort?: 'for_you' | 'trending' | 'latest' | 'top';
   page?: number;
   limit?: number;
 }

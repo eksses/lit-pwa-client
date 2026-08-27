@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sparkles, RefreshCw, TrendingUp, Flame } from 'lucide-react';
+import { Sparkles, RefreshCw, TrendingUp, Flame, Compass } from 'lucide-react';
 import { Language, Literature } from '../types';
 import { useLiteratureList } from '../hooks/useLiterature';
 import { useLanguageStore } from '../store/useLanguageStore';
@@ -20,7 +20,7 @@ export const HomePage: React.FC<HomePageProps> = ({
   onComment,
   onAuthorClick,
 }) => {
-  const [sortAlgo, setSortAlgo] = useState<'trending' | 'latest' | 'top'>('trending');
+  const [sortAlgo, setSortAlgo] = useState<'for_you' | 'trending' | 'latest' | 'top'>('for_you');
 
   const { uiLang } = useLanguageStore();
 
@@ -33,10 +33,24 @@ export const HomePage: React.FC<HomePageProps> = ({
     <div className="space-y-4 pb-20 max-w-xl mx-auto pt-1">
       {/* Pure Algorithm Feed Switcher Bar */}
       <div className="flex items-center justify-between border-b border-theme-main/40 pb-2.5">
-        <div className="flex items-center space-x-1.5 text-xs font-bnUI">
+        <div className="flex items-center space-x-1 overflow-x-auto no-scrollbar text-xs font-bnUI">
+          {/* For You Personalized Feed */}
+          <button
+            onClick={() => setSortAlgo('for_you')}
+            className={`px-3 py-1.5 rounded-full transition-all flex items-center space-x-1 shrink-0 ${
+              sortAlgo === 'for_you'
+                ? 'bg-emerald-500 text-white font-bold shadow-sm'
+                : 'opacity-60 hover:opacity-100'
+            }`}
+          >
+            <Compass className="w-3.5 h-3.5" />
+            <span>{uiLang === 'bn' ? 'আপনার জন্য' : 'For You'}</span>
+          </button>
+
+          {/* Trending Feed */}
           <button
             onClick={() => setSortAlgo('trending')}
-            className={`px-3 py-1.5 rounded-full transition-all flex items-center space-x-1.5 ${
+            className={`px-3 py-1.5 rounded-full transition-all flex items-center space-x-1 shrink-0 ${
               sortAlgo === 'trending'
                 ? 'bg-emerald-500/15 text-emerald-500 font-bold border border-emerald-500/30 shadow-sm'
                 : 'opacity-60 hover:opacity-100'
@@ -45,9 +59,11 @@ export const HomePage: React.FC<HomePageProps> = ({
             <TrendingUp className="w-3.5 h-3.5" />
             <span>{uiLang === 'bn' ? 'জনপ্রিয়' : 'Trending'}</span>
           </button>
+
+          {/* Latest Feed */}
           <button
             onClick={() => setSortAlgo('latest')}
-            className={`px-3 py-1.5 rounded-full transition-all flex items-center space-x-1.5 ${
+            className={`px-3 py-1.5 rounded-full transition-all flex items-center space-x-1 shrink-0 ${
               sortAlgo === 'latest'
                 ? 'bg-emerald-500/15 text-emerald-500 font-bold border border-emerald-500/30 shadow-sm'
                 : 'opacity-60 hover:opacity-100'
@@ -56,9 +72,11 @@ export const HomePage: React.FC<HomePageProps> = ({
             <Sparkles className="w-3.5 h-3.5" />
             <span>{uiLang === 'bn' ? 'নতুন' : 'Latest'}</span>
           </button>
+
+          {/* Top Rated Feed */}
           <button
             onClick={() => setSortAlgo('top')}
-            className={`px-3 py-1.5 rounded-full transition-all flex items-center space-x-1.5 ${
+            className={`px-3 py-1.5 rounded-full transition-all flex items-center space-x-1 shrink-0 ${
               sortAlgo === 'top'
                 ? 'bg-emerald-500/15 text-emerald-500 font-bold border border-emerald-500/30 shadow-sm'
                 : 'opacity-60 hover:opacity-100'
