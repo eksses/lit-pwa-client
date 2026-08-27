@@ -1,7 +1,8 @@
-import React, { useState, useMemo } from 'react';
-import { BookOpen, Scroll, Feather, Sparkles, Search, User as UserIcon, Users } from 'lucide-react';
+import React, { useState } from 'react';
+import { BookOpen, Scroll, Feather, Sparkles, Search, User as UserIcon, Users, ArrowRight } from 'lucide-react';
 import { Category, Literature } from '../types';
 import { useLiteratureList } from '../hooks/useLiterature';
+import { useAuthorsList } from '../hooks/useAuthors';
 import { useLanguageStore } from '../store/useLanguageStore';
 import { t } from '../utils/translations';
 import { LiteratureCard } from '../components/LiteratureCard';
@@ -17,56 +18,29 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({
   onComment,
   onAuthorClick,
 }) => {
-  const [selectedCat, setSelectedCat] = useState<Category>('poem');
+  const [selectedCat, setSelectedCat] = useState<'all' | Category | 'authors'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const { uiLang } = useLanguageStore();
 
-  const { data, isLoading } = useLiteratureList({ category: selectedCat });
+  const isAuthorsTab = selectedCat === 'authors';
 
-  const categories = [
-    {
-      id: 'poem' as Category,
-      title: t('poems', uiLang),
-      subtitle: 'Poems & Verses',
-      desc: t('categoryPoemsDesc', uiLang),
-      icon: Feather,
-      color: 'from-emerald-500/20 to-teal-500/10 border-emerald-500/30 text-emerald-500',
-    },
-    {
-      id: 'story' as Category,
-      title: t('stories', uiLang),
-      subtitle: 'Short Stories',
-      desc: t('categoryStoriesDesc', uiLang),
-      icon: BookOpen,
-      color: 'from-amber-500/20 to-orange-500/10 border-amber-500/30 text-amber-500',
-    },
-    {
-      id: 'micro_poem' as Category,
-      title: t('microPoetry', uiLang),
-      subtitle: 'Micro Poems',
-      desc: t('categoryMicroDesc', uiLang),
-      icon: Scroll,
-      color: 'from-purple-500/20 to-indigo-500/10 border-purple-500/30 text-purple-500',
-    },
+  // Fetch literature items for selected category
+  const { data: litData, isLoading: isLitLoading } = useLiteratureList({
+    category: selectedCat === 'all' || isAuthorsTab ? undefined : selectedCat,
+  });
+
+  // Fetch authors list for the Authors Directory tab or search query
+  const { data: authorsData, isLoading: isAuthorsLoading } = useAuthorsList(searchQuery);
+
+  const categoryPills = [
+    { id: 'all', label: uiLang === 'bn' ? 'সকল সাহিত্য' : 'All Works', icon: Sparkles },
+    { id: 'poem', label: t('poems', uiLang), icon: Feather },
+    { id: 'story', label: t('stories', uiLang), icon: BookOpen },
+    { id: 'micro_poem', label: t('microPoetry', uiLang), icon: Scroll },
+    { id: 'authors', label: uiLang === 'bn' ? 'লেখকবৃন্দ' : 'Authors', icon: Users },
   ];
 
-  // Extract unique featured authors
-  const uniqueAuthors = useMemo(() => {
-    const map = new Map<string, { id: string; name: string; username: string; avatarUrl?: string | null }>();
-    (data?.items || []).forEach((item) => {
-      if (item.author && !map.has(item.author.id)) {
-        map.set(item.author.id, {
-          id: item.author.id,
-          name: item.author.name,
-          username: item.author.username,
-          avatarUrl: item.author.avatarUrl,
-        });
-      }
-    });
-    return Array.from(map.values());
-  }, [data?.items]);
-
-  const filteredItems = (data?.items || []).filter((item) => {
+  const filteredLitItems = (litData?.items || []).filter((item) => {
     if (!searchQuery.trim()) return true;
     const q = searchQuery.toLowerCase();
     return (
@@ -78,24 +52,24 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({
   });
 
   return (
-    <div className="space-y-6 pb-20 max-w-xl mx-auto pt-2">
-      {/* Header & Global Search */}
+    <div className="space-y-5 pb-20 max-w-xl mx-auto pt-2">
+      {/* Header & Global Search Bar */}
       <div className="space-y-3">
         <div>
           <h2 className="text-2xl font-bold font-bnSerif tracking-tight">
-            {uiLang === 'bn' ? 'আবিষ্কার ও অনুসন্ধান' : 'Discover Literature'}
+            {uiLang === 'bn' ? 'আবিষ্কার ও অনুসন্ধান' : 'Discover & Search'}
           </h2>
           <p className="text-xs opacity-60 font-bnUI">
-            {uiLang === 'bn' ? 'কবিতা, গল্প ও সাহিত্যিকদের খুঁজে নিন' : 'Search by title, story content, or author'}
+            {uiLang === 'bn' ? 'বিষয়ভিত্তিক সাহিত্য এবং কবি ও লেখকদের খুঁজুন' : 'Explore poetry, fiction, or discover author profiles'}
           </p>
         </div>
 
-        {/* Search Bar Input */}
+        {/* Global Search Input */}
         <div className="relative">
           <Search className="w-4 h-4 opacity-40 absolute left-3.5 top-3" />
           <input
             type="text"
-            placeholder={uiLang === 'bn' ? 'কবিতা, গল্প বা লেখকের নাম...' : 'Search poems, stories, or authors...'}
+            placeholder={uiLang === 'bn' ? 'কবিতা, গল্প বা লেখকের নাম দিয়ে খুঁজুন...' : 'Search literature title, topic, or author name...'}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-10 pr-10 py-2.5 rounded-2xl border border-theme-main bg-theme-card text-theme-main text-sm font-bnUI focus:outline-none focus:ring-2 focus:ring-emerald-500/50 shadow-sm transition-all"
@@ -111,107 +85,144 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({
         </div>
       </div>
 
-      {/* Category Visual Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        {categories.map((cat) => {
-          const Icon = cat.icon;
-          const isSelected = selectedCat === cat.id;
+      {/* Category & Section Navigation Pills */}
+      <div className="flex items-center space-x-1.5 overflow-x-auto no-scrollbar border-b border-theme-main/40 pb-2.5 text-xs font-bnUI">
+        {categoryPills.map((pill) => {
+          const Icon = pill.icon;
+          const isActive = selectedCat === pill.id;
           return (
-            <div
-              key={cat.id}
-              onClick={() => setSelectedCat(cat.id)}
-              className={`p-4.5 rounded-3xl border bg-gradient-to-br cursor-pointer transition-all ${
-                cat.color
-              } ${
-                isSelected
-                  ? 'ring-2 ring-emerald-500 scale-[1.02] shadow-md'
-                  : 'opacity-80 hover:opacity-100 hover:scale-[1.01]'
+            <button
+              key={pill.id}
+              onClick={() => setSelectedCat(pill.id as any)}
+              className={`px-3 py-1.5 rounded-full whitespace-nowrap font-medium transition-all flex items-center space-x-1.5 ${
+                isActive
+                  ? 'bg-emerald-500 text-white font-semibold shadow-sm'
+                  : 'opacity-70 hover:opacity-100 hover:bg-gray-500/10'
               }`}
             >
-              <div className="flex items-center justify-between mb-2">
-                <Icon className="w-6 h-6" />
-                {isSelected && (
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500 text-white font-bnUI font-semibold">
-                    {uiLang === 'bn' ? 'নির্বাচিত' : 'Selected'}
-                  </span>
-                )}
-              </div>
-              <h3 className="text-lg font-bold font-bnUI">{cat.title}</h3>
-              <p className="text-[11px] font-enUI opacity-75">{cat.subtitle}</p>
-              <p className="text-xs font-bnUI opacity-90 mt-1">{cat.desc}</p>
-            </div>
+              <Icon className="w-3.5 h-3.5" />
+              <span>{pill.label}</span>
+            </button>
           );
         })}
       </div>
 
-      {/* Featured Authors Directory (if available) */}
-      {uniqueAuthors.length > 0 && (
-        <div className="space-y-2 pt-1">
-          <h3 className="text-xs font-bold font-bnUI opacity-75 uppercase tracking-wider flex items-center space-x-1">
-            <Users className="w-3.5 h-3.5 text-emerald-500" />
-            <span>{uiLang === 'bn' ? 'বিষয়ভিত্তিক লেখকবৃন্দ' : 'Authors in this section'}</span>
-          </h3>
-          <div className="flex items-center space-x-2 overflow-x-auto no-scrollbar py-1">
-            {uniqueAuthors.map((author) => (
-              <button
-                key={author.id}
-                onClick={() => onAuthorClick(author.id)}
-                className="flex items-center space-x-2 px-3 py-1.5 rounded-2xl border border-theme-main bg-theme-card hover:border-emerald-500/50 transition-all shrink-0 font-bnUI text-xs"
-              >
-                <div className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-500 font-bold flex items-center justify-center text-[10px] overflow-hidden">
-                  {author.avatarUrl ? (
-                    <img src={author.avatarUrl} alt={author.name} className="w-full h-full object-cover" />
-                  ) : (
-                    author.name.charAt(0).toUpperCase()
-                  )}
-                </div>
-                <span className="font-semibold">{author.name}</span>
-              </button>
-            ))}
+      {/* AUTHORS DIRECTORY VIEW */}
+      {isAuthorsTab ? (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-bold font-bnUI opacity-80 flex items-center space-x-1.5">
+              <Users className="w-4 h-4 text-emerald-500" />
+              <span>{uiLang === 'bn' ? 'সকল কবি ও লেখকগণ' : 'All Platform Authors'}</span>
+            </h3>
+            <span className="text-xs opacity-60 font-bnUI">
+              {authorsData?.length || 0} {uiLang === 'bn' ? 'জন লেখক' : 'authors'}
+            </span>
           </div>
+
+          {isAuthorsLoading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {[1, 2, 3, 4].map((n) => (
+                <div key={n} className="p-4 rounded-3xl border border-theme-main bg-theme-card animate-pulse h-28" />
+              ))}
+            </div>
+          ) : !authorsData || authorsData.length === 0 ? (
+            <div className="p-8 text-center rounded-3xl border border-theme-main bg-theme-card opacity-70 font-bnUI text-sm">
+              <UserIcon className="w-8 h-8 mx-auto opacity-40 mb-2" />
+              <p>{uiLang === 'bn' ? 'কোনো লেখক পাওয়া যায়নি।' : 'No authors found.'}</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {authorsData.map((author) => (
+                <div
+                  key={author.id}
+                  onClick={() => onAuthorClick(author.id)}
+                  className="p-4 rounded-3xl border border-theme-main/60 bg-theme-card hover:border-emerald-500/50 transition-all cursor-pointer space-y-2.5 group"
+                >
+                  <div className="flex items-center space-x-3">
+                    <div className="w-11 h-11 rounded-full bg-emerald-500/15 text-emerald-500 font-bold flex items-center justify-center text-sm border border-emerald-500/20 overflow-hidden shrink-0">
+                      {author.avatarUrl ? (
+                        <img src={author.avatarUrl} alt={author.name} className="w-full h-full object-cover rounded-full" />
+                      ) : (
+                        author.name.charAt(0).toUpperCase()
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-sm font-bold truncate group-hover:text-emerald-500 transition-colors font-bnUI">
+                        {author.name}
+                      </h4>
+                      <p className="text-xs opacity-60 font-enUI truncate">@{author.username}</p>
+                    </div>
+                  </div>
+
+                  {author.bio && (
+                    <p className="text-xs opacity-75 line-clamp-2 leading-relaxed font-bnUI">
+                      {author.bio}
+                    </p>
+                  )}
+
+                  <div className="pt-1 flex items-center justify-between text-[11px] opacity-75 font-bnUI border-t border-theme-main/30">
+                    <span>{author.worksCount || 0} {uiLang === 'bn' ? 'টি লেখা' : 'works'}</span>
+                    <span className="flex items-center space-x-1 text-emerald-500 font-semibold group-hover:translate-x-0.5 transition-transform">
+                      <span>{uiLang === 'bn' ? 'প্রোফাইল দেখুন' : 'View Profile'}</span>
+                      <ArrowRight className="w-3 h-3" />
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      ) : (
+        /* LITERATURE STREAM VIEW */
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-bold font-bnUI opacity-80 flex items-center space-x-1.5">
+              <Sparkles className="w-4 h-4 text-emerald-500" />
+              <span>
+                {selectedCat === 'all'
+                  ? (uiLang === 'bn' ? 'সকল সাহিত্য উপাদান' : 'All Literature Works')
+                  : selectedCat === 'poem'
+                  ? t('poems', uiLang)
+                  : selectedCat === 'story'
+                  ? t('stories', uiLang)
+                  : t('microPoetry', uiLang)}
+              </span>
+            </h3>
+            <span className="text-xs opacity-60 font-bnUI">
+              {filteredLitItems.length} {uiLang === 'bn' ? 'টি লেখা' : 'works'}
+            </span>
+          </div>
+
+          {isLitLoading ? (
+            <div className="space-y-3">
+              {[1, 2].map((n) => (
+                <div key={n} className="p-5 rounded-3xl border border-theme-main bg-theme-card animate-pulse h-32" />
+              ))}
+            </div>
+          ) : filteredLitItems.length === 0 ? (
+            <div className="p-8 text-center rounded-3xl border border-theme-main bg-theme-card opacity-70 font-bnUI text-sm space-y-1">
+              <UserIcon className="w-8 h-8 mx-auto opacity-40 mb-2" />
+              <p>{t('noResultsFound', uiLang)}</p>
+              <p className="text-xs opacity-60">
+                {uiLang === 'bn' ? 'অন্য নাম বা শব্দ দিয়ে অনুসন্ধান করুন' : 'Try searching for another keyword or topic'}
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {filteredLitItems.map((item) => (
+                <LiteratureCard
+                  key={item.id}
+                  item={item}
+                  onRead={onRead}
+                  onComment={onComment}
+                  onAuthorClick={onAuthorClick}
+                />
+              ))}
+            </div>
+          )}
         </div>
       )}
-
-      {/* Category Literature Items List */}
-      <div className="space-y-4 pt-1">
-        <div className="flex items-center justify-between border-b border-theme-main pb-2">
-          <h3 className="text-base font-bold font-bnUI flex items-center space-x-1.5">
-            <Sparkles className="w-4 h-4 text-emerald-500" />
-            <span>
-              {selectedCat === 'poem' ? t('poems', uiLang) : selectedCat === 'story' ? t('stories', uiLang) : t('microPoetry', uiLang)}
-            </span>
-          </h3>
-          <span className="text-xs opacity-60 font-bnUI">
-            {filteredItems.length} {uiLang === 'bn' ? 'টি উপাদান' : 'works'}
-          </span>
-        </div>
-
-        {isLoading ? (
-          <div className="space-y-3">
-            {[1, 2].map((n) => (
-              <div key={n} className="p-5 rounded-3xl border border-theme-main bg-theme-card animate-pulse h-32" />
-            ))}
-          </div>
-        ) : filteredItems.length === 0 ? (
-          <div className="p-8 text-center rounded-3xl border border-theme-main bg-theme-card opacity-70 font-bnUI text-sm space-y-1">
-            <UserIcon className="w-8 h-8 mx-auto opacity-40 mb-2" />
-            <p>{t('noResultsFound', uiLang)}</p>
-            <p className="text-xs opacity-60">{uiLang === 'bn' ? 'অন্য নাম বা শব্দ দিয়ে আবার চেষ্টা করুন' : 'Try searching for another keyword or author name'}</p>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {filteredItems.map((item) => (
-              <LiteratureCard
-                key={item.id}
-                item={item}
-                onRead={onRead}
-                onComment={onComment}
-                onAuthorClick={onAuthorClick}
-              />
-            ))}
-          </div>
-        )}
-      </div>
     </div>
   );
 };

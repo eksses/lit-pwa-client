@@ -2,6 +2,18 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../utils/api';
 import { AuthorProfile } from '../types';
 
+export function useAuthorsList(search?: string) {
+  return useQuery({
+    queryKey: ['authors', 'list', search],
+    queryFn: async () => {
+      const response = await api.get<{ authors: AuthorProfile[] }>('/authors', {
+        params: { search },
+      });
+      return response.data.authors;
+    },
+  });
+}
+
 export function useAuthorProfile(authorIdOrUsername: string) {
   return useQuery({
     queryKey: ['authors', 'profile', authorIdOrUsername],
