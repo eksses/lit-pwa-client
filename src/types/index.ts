@@ -1,4 +1,4 @@
-export type Category = 'poem' | 'story' | 'micro_poem';
+export type Category = 'poem' | 'story' | 'micro_poem' | 'prose_poetry' | 'uncategorized' | 'other';
 export type Language = 'bn' | 'en';
 export type Theme = 'light' | 'sepia' | 'dark';
 

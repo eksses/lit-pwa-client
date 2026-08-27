@@ -37,6 +37,8 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({
     { id: 'poem', label: t('poems', uiLang), icon: Feather },
     { id: 'story', label: t('stories', uiLang), icon: BookOpen },
     { id: 'micro_poem', label: t('microPoetry', uiLang), icon: Scroll },
+    { id: 'prose_poetry', label: t('prosePoetry', uiLang), icon: Feather },
+    { id: 'uncategorized', label: t('uncategorized', uiLang), icon: BookOpen },
     { id: 'authors', label: uiLang === 'bn' ? 'লেখকবৃন্দ' : 'Authors', icon: Users },
   ];
 

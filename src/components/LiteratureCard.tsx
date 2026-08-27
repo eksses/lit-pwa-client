@@ -29,10 +29,13 @@ export const LiteratureCard: React.FC<LiteratureCardProps> = ({
 
   const isBengali = item.language === 'bn';
 
-  const categoryLabelMap = {
+  const categoryLabelMap: Record<string, string> = {
     poem: t('poems', uiLang),
     story: t('stories', uiLang),
     micro_poem: t('microPoetry', uiLang),
+    prose_poetry: t('prosePoetry', uiLang),
+    uncategorized: t('uncategorized', uiLang),
+    other: t('uncategorized', uiLang),
   };
 
   const handleLike = (e: React.MouseEvent) => {
