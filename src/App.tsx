@@ -97,6 +97,7 @@ export default function App() {
           onBack={() => setActiveLiterature(null)}
           onComment={handleOpenComment}
           onOpenAuth={() => setIsAuthOpen(true)}
+          onNavigateToLiterature={handleReadLiterature}
           onAuthorClick={(authorId) => {
             setActiveLiterature(null);
             handleAuthorClick(authorId);
