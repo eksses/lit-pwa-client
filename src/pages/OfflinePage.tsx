@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BookmarkCheck, Trash2, Clock, History, Bookmark, Heart } from 'lucide-react';
+import { BookmarkCheck, Trash2, WifiOff, Clock, History, Bookmark } from 'lucide-react';
 import { Literature } from '../types';
 import { useReaderStore } from '../store/useReaderStore';
 import { useLanguageStore } from '../store/useLanguageStore';
@@ -19,9 +19,9 @@ export const OfflinePage: React.FC<OfflinePageProps> = ({ onRead, onGoHome }) =>
   const currentList = activeSubTab === 'bookmarks' ? savedItems : readHistoryItems;
 
   return (
-    <div className="space-y-6 pb-20 max-w-2xl mx-auto px-4 pt-3">
-      {/* Editorial Header Banner */}
-      <div className="p-5 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 flex items-center justify-between">
+    <div className="space-y-4 pb-20 max-w-xl mx-auto pt-2">
+      {/* Header Banner */}
+      <div className="p-4 rounded-3xl border border-emerald-500/30 bg-emerald-500/10 flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center shrink-0">
             <BookmarkCheck className="w-5 h-5" />
@@ -38,7 +38,7 @@ export const OfflinePage: React.FC<OfflinePageProps> = ({ onRead, onGoHome }) =>
       </div>
 
       {/* Sub-Tabs: Bookmarks vs Reading History */}
-      <div className="flex items-center justify-between border-b border-theme-main/40 pb-3">
+      <div className="flex items-center justify-between border-b border-theme-main/40 pb-2">
         <div className="flex items-center space-x-1.5 text-xs font-bnUI">
           <button
             onClick={() => setActiveSubTab('bookmarks')}
@@ -75,27 +75,26 @@ export const OfflinePage: React.FC<OfflinePageProps> = ({ onRead, onGoHome }) =>
         )}
       </div>
 
-      {/* Rule #14: Designed Empty State */}
       {currentList.length === 0 ? (
-        <div className="p-12 text-center rounded-2xl border border-theme-main/40 bg-theme-card space-y-4">
-          <Heart className="w-10 h-10 text-emerald-500/40 mx-auto" />
+        <div className="p-10 text-center rounded-3xl border border-theme-main bg-theme-card space-y-4">
+          <WifiOff className="w-12 h-12 opacity-40 mx-auto" />
           <div className="space-y-1">
             <h3 className="text-base font-bold font-bnUI">
               {activeSubTab === 'bookmarks'
-                ? (uiLang === 'bn' ? 'এখনো কোনো কবিতা বুকমার্ক করেননি' : 'Nothing saved yet')
+                ? (uiLang === 'bn' ? 'কোনো বুকমার্ক সংরক্ষিত নেই' : 'No Bookmarks Saved')
                 : (uiLang === 'bn' ? 'কোনো পঠিত ইতিহাস নেই' : 'No Reading History')}
             </h3>
-            <p className="text-xs opacity-60 font-bnUI max-w-xs mx-auto leading-relaxed">
+            <p className="text-xs opacity-60 font-bnUI max-w-xs mx-auto">
               {activeSubTab === 'bookmarks'
-                ? (uiLang === 'bn' ? 'যখন কোনো কবিতা আপনাকে ছুঁয়ে যাবে, তখন এখানে সংরক্ষণ করুন।' : 'When a poem speaks to you, save it here.')
-                : (uiLang === 'bn' ? 'আপনার পঠিত কবিতাগুলো এখানে স্বয়ংক্রিয়ভাবে থাকবে।' : 'Poems you read will automatically appear here.')}
+                ? (uiLang === 'bn' ? 'পছন্দের কবিতায় বুকমার্ক আইকনে চাপ দিয়ে অফলাইনে সংরক্ষণ করুন' : 'Tap the bookmark icon on literature cards to save for offline')
+                : (uiLang === 'bn' ? 'আপনার পঠিত সকল কবিতা ও গল্প এখানে স্বয়ংক্রিয়ভাবে সংরক্ষিত থাকবে' : 'Poems you read will automatically appear here for offline access')}
             </p>
           </div>
           <button
             onClick={onGoHome}
-            className="px-5 py-2.5 rounded-xl bg-emerald-500 text-white text-xs font-semibold font-bnUI shadow-sm hover:bg-emerald-600 transition-colors"
+            className="px-4 py-2 rounded-xl bg-emerald-500 text-white text-xs font-medium font-bnUI shadow-sm"
           >
-            {uiLang === 'bn' ? 'কবিতা খুঁজুন' : 'Explore poems'}
+            {uiLang === 'bn' ? 'সাহিত্য ব্রাউজ করুন' : 'Browse Literature'}
           </button>
         </div>
       ) : (
@@ -106,7 +105,7 @@ export const OfflinePage: React.FC<OfflinePageProps> = ({ onRead, onGoHome }) =>
               <div
                 key={item.id}
                 onClick={() => onRead(item)}
-                className="p-5 rounded-2xl border border-theme-main/40 bg-theme-card hover:border-emerald-500/50 transition-all cursor-pointer space-y-2 group"
+                className="p-4 sm:p-5 rounded-3xl border border-theme-main/60 bg-theme-card hover:border-emerald-500/50 transition-all cursor-pointer space-y-2 group"
               >
                 <div className="flex items-center justify-between">
                   <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 font-semibold font-bnUI">
@@ -136,7 +135,7 @@ export const OfflinePage: React.FC<OfflinePageProps> = ({ onRead, onGoHome }) =>
                 </h3>
 
                 <p
-                  className={`text-xs line-clamp-2 opacity-80 leading-relaxed ${
+                  className={`text-xs line-clamp-2 opacity-80 ${
                     isBengali ? 'font-bnSerif' : 'font-enSerif'
                   }`}
                 >
