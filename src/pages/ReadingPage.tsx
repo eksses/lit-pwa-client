@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ArrowLeft, Sliders, Heart, MessageSquare, Bookmark, Share2, UserPlus, UserCheck, Eye, Clock } from 'lucide-react';
 import { Literature } from '../types';
 import { useReaderStore } from '../store/useReaderStore';
+import { useAuthStore } from '../store/useAuthStore';
 import { useLanguageStore } from '../store/useLanguageStore';
 import { t } from '../utils/translations';
 import { useToggleLike } from '../hooks/useLiterature';
@@ -13,6 +14,7 @@ interface ReadingPageProps {
   onBack: () => void;
   onComment: (item: Literature) => void;
   onAuthorClick?: (authorId: string) => void;
+  onOpenAuth?: () => void;
 }
 
 export const ReadingPage: React.FC<ReadingPageProps> = ({
@@ -20,7 +22,9 @@ export const ReadingPage: React.FC<ReadingPageProps> = ({
   onBack,
   onComment,
   onAuthorClick,
+  onOpenAuth,
 }) => {
+  const { isAuthenticated } = useAuthStore();
   const { fontSize, toggleSaveOffline, isSavedOffline } = useReaderStore();
   const { uiLang } = useLanguageStore();
   const [showControls, setShowControls] = useState(false);
@@ -40,6 +44,10 @@ export const ReadingPage: React.FC<ReadingPageProps> = ({
   };
 
   const handleFollow = () => {
+    if (!isAuthenticated) {
+      if (onOpenAuth) onOpenAuth();
+      return;
+    }
     if (authorId) {
       toggleFollowMutation.mutate(authorId);
     }

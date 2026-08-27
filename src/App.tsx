@@ -17,7 +17,7 @@ import { useAuthStore } from './store/useAuthStore';
 import { useReaderStore } from './store/useReaderStore';
 
 export default function App() {
-  const { checkAuth } = useAuthStore();
+  const { checkAuth, isAuthenticated } = useAuthStore();
   const { theme, setTheme } = useReaderStore();
 
   const [activeTab, setActiveTab] = useState<string>('home');
@@ -68,6 +68,14 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleCreateClick = () => {
+    if (isAuthenticated) {
+      setIsCreateOpen(true);
+    } else {
+      setIsAuthOpen(true);
+    }
+  };
+
   return (
     <div
       className={`min-h-screen transition-colors duration-200 ${
@@ -84,6 +92,7 @@ export default function App() {
           literature={activeLiterature}
           onBack={() => setActiveLiterature(null)}
           onComment={handleOpenComment}
+          onOpenAuth={() => setIsAuthOpen(true)}
           onAuthorClick={(authorId) => {
             setActiveLiterature(null);
             handleAuthorClick(authorId);
@@ -98,7 +107,7 @@ export default function App() {
             langFilter={langFilter}
             onLangFilterChange={setLangFilter}
             onOpenAuth={() => setIsAuthOpen(true)}
-            onOpenCreate={() => setIsCreateOpen(true)}
+            onOpenCreate={handleCreateClick}
             onNavigateTab={handleTabChange}
           />
 
@@ -110,7 +119,7 @@ export default function App() {
                 onRead={handleReadLiterature}
                 onComment={handleOpenComment}
                 onAuthorClick={handleAuthorClick}
-                onOpenCreate={() => setIsCreateOpen(true)}
+                onOpenCreate={handleCreateClick}
               />
             )}
 
@@ -145,7 +154,7 @@ export default function App() {
                 onRead={handleReadLiterature}
                 onComment={handleOpenComment}
                 onOpenAuth={() => setIsAuthOpen(true)}
-                onOpenCreate={() => setIsCreateOpen(true)}
+                onOpenCreate={handleCreateClick}
               />
             )}
           </main>
