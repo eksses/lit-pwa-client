@@ -33,6 +33,15 @@
     transition: background-color 0.2s ease, color 0.2s ease;
     font-family: 'Hind Siliguri', 'Inter', sans-serif;
   }
+
+  /* Force all form controls to inherit theme text & background colors */
+  input,
+  textarea,
+  select,
+  option {
+    color: var(--text-main);
+    background-color: var(--bg-card);
+  }
 }
 
 /* Custom theme helper classes */
@@ -50,6 +59,25 @@
 
 .border-theme-main {
   border-color: var(--border-main);
+}
+
+/* Placeholder contrast styling per theme */
+html.theme-dark ::placeholder,
+html.theme-dark ::-webkit-input-placeholder {
+  color: #9ca3af !important;
+  opacity: 0.7;
+}
+
+html.theme-sepia ::placeholder,
+html.theme-sepia ::-webkit-input-placeholder {
+  color: #785c28 !important;
+  opacity: 0.7;
+}
+
+html.theme-light ::placeholder,
+html.theme-light ::-webkit-input-placeholder {
+  color: #6b7280 !important;
+  opacity: 0.7;
 }
 
 /* Custom Scrollbars for dark & sepia modes */
@@ -74,8 +102,8 @@ html.theme-dark input:-webkit-autofill:hover,
 html.theme-dark input:-webkit-autofill:focus,
 html.theme-dark textarea:-webkit-autofill,
 html.theme-dark select:-webkit-autofill {
-  -webkit-text-fill-color: #e5e7eb;
-  -webkit-box-shadow: 0 0 0px 1000px #1e1e1e inset;
+  -webkit-text-fill-color: #e5e7eb !important;
+  -webkit-box-shadow: 0 0 0px 1000px #1e1e1e inset !important;
   transition: background-color 5000s ease-in-out 0s;
 }
 

@@ -84,7 +84,7 @@ export const HomePage: React.FC<HomePageProps> = ({
             placeholder={t('searchPlaceholder', uiLang)}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-theme-main bg-theme-card text-sm font-bnUI focus:outline-none focus:ring-2 focus:ring-emerald-500/50 shadow-sm transition-all"
+            className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-theme-main bg-theme-card text-theme-main text-sm font-bnUI focus:outline-none focus:ring-2 focus:ring-emerald-500/50 shadow-sm transition-all"
           />
           {searchQuery && (
             <button

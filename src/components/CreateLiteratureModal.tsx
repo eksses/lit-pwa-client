@@ -58,14 +58,14 @@ export const CreateLiteratureModal: React.FC<CreateLiteratureModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4 animate-in fade-in duration-200">
       <div
-        className="w-full max-w-xl bg-theme-card border border-theme-main rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+        className="w-full max-w-xl bg-theme-card text-theme-main border border-theme-main rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
         <div className="p-4 border-b border-theme-main flex items-center justify-between bg-theme-main/50">
           <div className="flex items-center space-x-2">
             <Feather className="w-5 h-5 text-emerald-500" />
-            <h3 className="text-base font-bold font-bnUI">{t('publishHeader', uiLang)}</h3>
+            <h3 className="text-base font-bold font-bnUI text-theme-main">{t('publishHeader', uiLang)}</h3>
           </div>
           <button
             onClick={onClose}
@@ -92,11 +92,11 @@ export const CreateLiteratureModal: React.FC<CreateLiteratureModalProps> = ({
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value as Category)}
-                className="w-full px-3 py-2 rounded-xl border border-theme-main bg-theme-main text-xs font-bnUI focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                className="w-full px-3 py-2 rounded-xl border border-theme-main bg-theme-main text-theme-main text-xs font-bnUI focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
               >
-                <option value="poem">{t('poems', uiLang)}</option>
-                <option value="story">{t('stories', uiLang)}</option>
-                <option value="micro_poem">{t('microPoetry', uiLang)}</option>
+                <option value="poem" className="bg-theme-card text-theme-main">{t('poems', uiLang)}</option>
+                <option value="story" className="bg-theme-card text-theme-main">{t('stories', uiLang)}</option>
+                <option value="micro_poem" className="bg-theme-card text-theme-main">{t('microPoetry', uiLang)}</option>
               </select>
             </div>
 
@@ -107,10 +107,10 @@ export const CreateLiteratureModal: React.FC<CreateLiteratureModalProps> = ({
               <select
                 value={language}
                 onChange={(e) => setLanguage(e.target.value as Language)}
-                className="w-full px-3 py-2 rounded-xl border border-theme-main bg-theme-main text-xs font-bnUI focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                className="w-full px-3 py-2 rounded-xl border border-theme-main bg-theme-main text-theme-main text-xs font-bnUI focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
               >
-                <option value="bn">বাংলা (Bangla)</option>
-                <option value="en">English</option>
+                <option value="bn" className="bg-theme-card text-theme-main">বাংলা (Bangla)</option>
+                <option value="en" className="bg-theme-card text-theme-main">English</option>
               </select>
             </div>
           </div>
@@ -126,7 +126,7 @@ export const CreateLiteratureModal: React.FC<CreateLiteratureModalProps> = ({
               placeholder={language === 'bn' ? 'আপনার রচনার শিরোনাম লিখুন...' : 'Enter literature title...'}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className={`w-full px-3.5 py-2.5 rounded-xl border border-theme-main bg-theme-main text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500/50 ${
+              className={`w-full px-3.5 py-2.5 rounded-xl border border-theme-main bg-theme-main text-theme-main text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500/50 ${
                 language === 'bn' ? 'font-bnSerif' : 'font-enSerif'
               }`}
             />
@@ -152,7 +152,7 @@ export const CreateLiteratureModal: React.FC<CreateLiteratureModalProps> = ({
               }
               value={content}
               onChange={(e) => handleContentChange(e.target.value)}
-              className={`w-full px-3.5 py-3 rounded-xl border border-theme-main bg-theme-main text-base leading-relaxed focus:outline-none focus:ring-2 focus:ring-emerald-500/50 ${
+              className={`w-full px-3.5 py-3 rounded-xl border border-theme-main bg-theme-main text-theme-main text-base leading-relaxed focus:outline-none focus:ring-2 focus:ring-emerald-500/50 ${
                 language === 'bn' ? 'font-bnSerif' : 'font-enSerif'
               }`}
             />

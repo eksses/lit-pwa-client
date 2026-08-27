@@ -64,7 +64,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4 animate-in fade-in duration-200">
       <div
-        className="w-full max-w-md bg-theme-card border border-theme-main rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+        className="w-full max-w-md bg-theme-card text-theme-main border border-theme-main rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header & Tabs */}
@@ -128,7 +128,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                     placeholder="username or email"
                     value={identifier}
                     onChange={(e) => setIdentifier(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-theme-main bg-theme-main text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                    className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-theme-main bg-theme-main text-theme-main text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                   />
                 </div>
               </div>
@@ -145,7 +145,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-theme-main bg-theme-main text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                    className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-theme-main bg-theme-main text-theme-main text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                   />
                 </div>
               </div>
@@ -207,7 +207,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                     placeholder="Rabindranath Tagore"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 rounded-xl border border-theme-main bg-theme-main text-sm font-bnUI focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                    className="w-full pl-9 pr-3 py-2 rounded-xl border border-theme-main bg-theme-main text-theme-main text-sm font-bnUI focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                   />
                 </div>
               </div>
@@ -224,7 +224,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                     placeholder="tagore"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 rounded-xl border border-theme-main bg-theme-main text-sm font-enUI focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                    className="w-full pl-9 pr-3 py-2 rounded-xl border border-theme-main bg-theme-main text-theme-main text-sm font-enUI focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                   />
                 </div>
               </div>
@@ -241,7 +241,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                     placeholder="poet@kavyakatha.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 rounded-xl border border-theme-main bg-theme-main text-sm font-enUI focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                    className="w-full pl-9 pr-3 py-2 rounded-xl border border-theme-main bg-theme-main text-theme-main text-sm font-enUI focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                   />
                 </div>
               </div>
@@ -258,7 +258,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 rounded-xl border border-theme-main bg-theme-main text-sm font-enUI focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                    className="w-full pl-9 pr-3 py-2 rounded-xl border border-theme-main bg-theme-main text-theme-main text-sm font-enUI focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                   />
                 </div>
               </div>
@@ -272,7 +272,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                   placeholder={uiLang === 'bn' ? 'কবি ও গল্পকার...' : 'Poet & Storyteller...'}
                   value={bio}
                   onChange={(e) => setBio(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl border border-theme-main bg-theme-main text-xs font-bnUI focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                  className="w-full px-3 py-2 rounded-xl border border-theme-main bg-theme-main text-theme-main text-xs font-bnUI focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                 />
               </div>
 

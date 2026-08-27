@@ -54,7 +54,7 @@ export const CommentModal: React.FC<CommentModalProps> = ({ isOpen, onClose, lit
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/75 backdrop-blur-sm p-0 sm:p-4 animate-in fade-in duration-200">
       <div
-        className="w-full max-w-lg bg-theme-card border-t sm:border border-theme-main rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col max-h-[85vh] sm:max-h-[80vh] overflow-hidden"
+        className="w-full max-w-lg bg-theme-card text-theme-main border-t sm:border border-theme-main rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col max-h-[85vh] sm:max-h-[80vh] overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
@@ -126,7 +126,7 @@ export const CommentModal: React.FC<CommentModalProps> = ({ isOpen, onClose, lit
                 placeholder={uiLang === 'bn' ? 'আপনার নাম বা ডাকনাম...' : 'Your display name...'}
                 value={guestName}
                 onChange={(e) => setGuestName(e.target.value)}
-                className="w-full px-3 py-1.5 rounded-xl border border-theme-main bg-theme-main text-xs font-bnUI focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                className="w-full px-3 py-1.5 rounded-xl border border-theme-main bg-theme-main text-theme-main text-xs font-bnUI focus:outline-none focus:ring-1 focus:ring-emerald-500"
               />
             </div>
           )}
@@ -137,7 +137,7 @@ export const CommentModal: React.FC<CommentModalProps> = ({ isOpen, onClose, lit
               placeholder={t('commentPlaceholder', uiLang)}
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              className="flex-1 px-3 py-2 rounded-xl border border-theme-main bg-theme-main text-sm font-bnUI focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+              className="flex-1 px-3 py-2 rounded-xl border border-theme-main bg-theme-main text-theme-main text-sm font-bnUI focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
             />
             <button
               type="submit"
