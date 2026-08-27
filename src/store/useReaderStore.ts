@@ -6,13 +6,14 @@ interface ReaderState {
   theme: Theme;
   fontSize: number;
   savedItems: Literature[];
-  readHistoryIds: string[];
+  readHistoryItems: Literature[];
   setTheme: (theme: Theme) => void;
   setFontSize: (size: number) => void;
   toggleSaveOffline: (item: Literature) => void;
   autoCacheItem: (item: Literature) => void;
   isSavedOffline: (id: string) => boolean;
   hasRead: (id: string) => boolean;
+  clearHistory: () => void;
 }
 
 export const useReaderStore = create<ReaderState>()(
@@ -21,7 +22,7 @@ export const useReaderStore = create<ReaderState>()(
       theme: 'light',
       fontSize: 16,
       savedItems: [],
-      readHistoryIds: [],
+      readHistoryItems: [],
 
       setTheme: (theme: Theme) => set({ theme }),
 
@@ -29,31 +30,31 @@ export const useReaderStore = create<ReaderState>()(
 
       toggleSaveOffline: (item: Literature) => {
         const { savedItems } = get();
-        const exists = savedItems.some((saved) => saved.id === item.id);
+        const exists = (savedItems || []).some((saved) => saved.id === item.id);
         if (exists) {
-          set({ savedItems: savedItems.filter((saved) => saved.id !== item.id) });
+          set({ savedItems: (savedItems || []).filter((saved) => saved.id !== item.id) });
         } else {
-          set({ savedItems: [...savedItems, item] });
+          set({ savedItems: [item, ...(savedItems || [])] });
         }
       },
 
       autoCacheItem: (item: Literature) => {
-        const { savedItems, readHistoryIds } = get();
-        const exists = savedItems.some((saved) => saved.id === item.id);
-        const newSavedItems = exists ? savedItems : [item, ...savedItems];
-        const newReadIds = readHistoryIds.includes(item.id)
-          ? readHistoryIds
-          : [...readHistoryIds, item.id];
-        set({ savedItems: newSavedItems, readHistoryIds: newReadIds });
+        const { readHistoryItems } = get();
+        const exists = (readHistoryItems || []).some((read) => read.id === item.id);
+        if (!exists) {
+          set({ readHistoryItems: [item, ...(readHistoryItems || [])] });
+        }
       },
 
       isSavedOffline: (id: string) => {
-        return get().savedItems.some((item) => item.id === id);
+        return (get().savedItems || []).some((item) => item.id === id);
       },
 
       hasRead: (id: string) => {
-        return (get().readHistoryIds || []).includes(id);
+        return (get().readHistoryItems || []).some((item) => item.id === id);
       },
+
+      clearHistory: () => set({ readHistoryItems: [] }),
     }),
     {
       name: 'lit_pwa_reader_store',
