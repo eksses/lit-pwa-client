@@ -4,6 +4,7 @@ import { Category, Language } from '../types';
 import { useCreateLiterature } from '../hooks/useLiterature';
 import { useLanguageStore } from '../store/useLanguageStore';
 import { t } from '../utils/translations';
+import { playPublishSound } from '../utils/audio';
 
 interface CreateLiteratureModalProps {
   isOpen: boolean;
@@ -41,6 +42,8 @@ export const CreateLiteratureModal: React.FC<CreateLiteratureModalProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || !content.trim()) return;
+
+    playPublishSound();
 
     let finalTitle = title.trim();
     if (isSerialOrNovel && partNumber.trim()) {

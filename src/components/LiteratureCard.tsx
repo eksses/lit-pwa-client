@@ -8,6 +8,7 @@ import { useLanguageStore } from '../store/useLanguageStore';
 import { useToastStore } from '../store/useToastStore';
 import { t } from '../utils/translations';
 import { ConfirmModal } from './ConfirmModal';
+import { playLikeSound, playBookmarkSound } from '../utils/audio';
 
 interface LiteratureCardProps {
   item: Literature;
@@ -71,6 +72,7 @@ export const LiteratureCard: React.FC<LiteratureCardProps> = ({
 
   const handleLike = (e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
+    playLikeSound();
     toggleLikeMutation.mutate(item.id);
     showToast(
       item.is_liked
@@ -81,6 +83,7 @@ export const LiteratureCard: React.FC<LiteratureCardProps> = ({
 
   const handleSave = (e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
+    playBookmarkSound();
     toggleSaveOffline(item);
     showToast(
       saved
