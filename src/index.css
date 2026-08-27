@@ -8,6 +8,7 @@
     --text-main: #111827;
     --bg-card: #f9fafb;
     --border-main: #e5e7eb;
+    color-scheme: light;
   }
 
   html.theme-sepia {
@@ -15,6 +16,7 @@
     --text-main: #2d2318;
     --bg-card: #f4e7ca;
     --border-main: #e4d3ab;
+    color-scheme: light;
   }
 
   html.theme-dark {
@@ -22,6 +24,7 @@
     --text-main: #e5e7eb;
     --bg-card: #1e1e1e;
     --border-main: #2a2a2a;
+    color-scheme: dark;
   }
 
   body {
@@ -49,19 +52,39 @@
   border-color: var(--border-main);
 }
 
-/* Typography Helpers */
-.font-bn-ui {
-  font-family: 'Hind Siliguri', sans-serif;
+/* Custom Scrollbars for dark & sepia modes */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.25);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(16, 185, 129, 0.5);
 }
 
-.font-bn-serif {
-  font-family: 'Noto Serif Bengali', serif;
+/* Dark Mode Input Autofill fix */
+html.theme-dark input:-webkit-autofill,
+html.theme-dark input:-webkit-autofill:hover,
+html.theme-dark input:-webkit-autofill:focus,
+html.theme-dark textarea:-webkit-autofill,
+html.theme-dark select:-webkit-autofill {
+  -webkit-text-fill-color: #e5e7eb;
+  -webkit-box-shadow: 0 0 0px 1000px #1e1e1e inset;
+  transition: background-color 5000s ease-in-out 0s;
 }
 
-.font-en-ui {
-  font-family: 'Inter', sans-serif;
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
-
-.font-en-serif {
-  font-family: 'Merriweather', serif;
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }
